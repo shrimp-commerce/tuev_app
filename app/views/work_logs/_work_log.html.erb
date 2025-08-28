@@ -1,0 +1,27 @@
+<div id="<%= dom_id work_log %>">
+  <p>
+    <strong>Date:</strong>
+    <%= work_log.date %>
+  </p>
+
+  <p>
+    <strong>Start time:</strong>
+    <%= work_log.start_time %>
+  </p>
+
+  <p>
+    <strong>End time:</strong>
+    <%= work_log.end_time %>
+  </p>
+
+  <p>
+    <strong>Description:</strong>
+    <%= work_log.description %>
+  </p>
+
+  <p>
+    <strong>Updated at:</strong>
+    <%= time_tag work_log.updated_at, "data-local": "time", "data-format": "%B %e, %Y %l:%M%P" %>
+  </p>
+
+</div>

@@ -1,0 +1,10 @@
+<h1>All Work Logs (Admin)</h1>
+<% @work_logs.each do |work_log| %>
+  <div>
+    <strong>User:</strong> <%= work_log.user.email_address %><br>
+    <strong>Date:</strong> <%= work_log.date %><br>
+    <strong>Start Time:</strong> <%= work_log.start_time %><br>
+    <strong>Description:</strong> <%= work_log.description %><br>
+  </div>
+  <hr>
+<% end %>

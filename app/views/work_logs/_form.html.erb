@@ -1,0 +1,37 @@
+<%= form_with(model: work_log) do |form| %>
+  <% if work_log.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(work_log.errors.count, "error") %> prohibited this work_log from being saved:</h2>
+
+      <ul>
+        <% work_log.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :date, style: "display: block" %>
+    <%= form.date_field :date, value: (work_log.date || Date.current).strftime('%Y-%m-%d') %>
+  </div>
+
+  <div>
+    <%= form.label :start_time, style: "display: block" %>
+    <%= form.time_field :start_time, value: (work_log.start_time || Time.current).strftime('%H:%M') %>
+  </div>
+
+  <div>
+    <%= form.label :end_time, style: "display: block" %>
+    <%= form.time_field :end_time %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.rich_textarea :description %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
