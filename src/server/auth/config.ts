@@ -1,6 +1,7 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import bcrypt from "bcryptjs";
+import type { DefaultSession, NextAuthConfig } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
 
@@ -30,9 +31,83 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
-export const authConfig = {
+export const authOptions: NextAuthConfig = {
+  callbacks: {
+    async redirect({ baseUrl }: { baseUrl: string }) {
+      // always redirect back to home
+      return `${baseUrl}${process.env.NEXT_BASE_PATH ?? ""}`;
+    },
+    session: async ({
+      session,
+      token,
+    }: {
+      session: DefaultSession;
+      token: { sub?: string };
+    }) => {
+      if (session?.user) {
+        session.user.id = token.sub!;
+      }
+      return session;
+    },
+    jwt: async ({
+      token,
+      user,
+    }: {
+      token: Record<string, unknown>;
+      user?: { id?: string };
+      account?: unknown;
+      profile?: unknown;
+      trigger?: "update" | "signIn" | "signUp";
+      isNewUser?: boolean;
+      session?: unknown;
+    }) => {
+      if (user?.id) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+  },
+  session: { strategy: "jwt" },
+  adapter: PrismaAdapter(db),
   providers: [
-    DiscordProvider,
+    CredentialsProvider({
+      credentials: {
+        name: { label: "Username", placeholder: "name" },
+        password: {
+          label: "Password",
+          placeholder: "password",
+          type: "password",
+        },
+      },
+      async authorize(credentials: Record<string, unknown> | undefined) {
+        const userName =
+          typeof credentials?.name === "string" ? credentials.name : undefined;
+        const password =
+          typeof credentials?.password === "string"
+            ? credentials.password
+            : undefined;
+
+        if (userName && password) {
+          const dbUser = await db.user.findFirst({
+            where: { name: userName },
+          });
+
+          if (
+            typeof dbUser?.password === "string" &&
+            typeof password === "string" &&
+            (await bcrypt.compare(password, dbUser.password))
+          ) {
+            return {
+              id: dbUser.id,
+              name: dbUser.name,
+              email: dbUser.email,
+            };
+          }
+        }
+
+        return null;
+      },
+    }),
     /**
      * ...add more providers here.
      *
@@ -43,14 +118,6 @@ export const authConfig = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-  adapter: PrismaAdapter(db),
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
-  },
-} satisfies NextAuthConfig;
+};
+
+// getServerSession is not available in NextAuth v5
