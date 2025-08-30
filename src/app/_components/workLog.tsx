@@ -43,7 +43,6 @@ export function LatestWorkLog() {
 
   return (
     <div className="w-full max-w-xs">
-      {t("title")}
       {latestWorkLog ? (
         <p className="truncate">
           {t("latestWorkLog", {

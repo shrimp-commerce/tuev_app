@@ -20,7 +20,6 @@
     "signInAgain": "Sign In Again"
   },
   "HomePage": {
-    "title": "Hello world!",
     "mainHeading": "Time Tracking app",
     "loggedInAs": "Logged in as {name}",
     "signIn": "Sign in",

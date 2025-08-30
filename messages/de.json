@@ -20,7 +20,6 @@
     "signInAgain": "Erneut anmelden"
   },
   "HomePage": {
-    "title": "Hallo Welt!",
     "mainHeading": "Zeiterfassungs-App",
     "loggedInAs": "Angemeldet als {name}",
     "signIn": "Anmelden",
