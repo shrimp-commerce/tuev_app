@@ -17,6 +17,7 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
+import React from "react";
 import Header from "./Header";
 
 export default function RootLayout({
@@ -31,7 +32,9 @@ export default function RootLayout({
           <SessionProvider>
             <NextIntlClientProvider>
               <Header />
-              {children}
+              <React.Suspense fallback={<div>Loading...</div>}>
+                {children}
+              </React.Suspense>
             </NextIntlClientProvider>
           </SessionProvider>
         </TRPCReactProvider>
