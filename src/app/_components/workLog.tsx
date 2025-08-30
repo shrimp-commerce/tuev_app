@@ -91,7 +91,7 @@ export function LatestWorkLog() {
       >
         <Input
           type="text"
-          placeholder={t("workLogTitlePlaceholder")}
+          placeholder={t("description")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />

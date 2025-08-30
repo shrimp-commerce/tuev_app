@@ -30,7 +30,7 @@
     "endTimeLabel": "Endzeit",
     "noValue": "-",
     "noWorkLogs": "Sie haben noch keine Arbeitszeiteinträge.",
-    "workLogTitlePlaceholder": "Titel",
+  "description": "Beschreibung",
     "submitting": "Wird gesendet...",
     "submit": "Senden"
   },

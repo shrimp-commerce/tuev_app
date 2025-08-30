@@ -30,7 +30,7 @@
     "endTimeLabel": "End time",
     "noValue": "-",
     "noWorkLogs": "You have no work logs yet.",
-    "workLogTitlePlaceholder": "Title",
+  "description": "Description",
     "submitting": "Submitting...",
     "submit": "Submit"
   },
