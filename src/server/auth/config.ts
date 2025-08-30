@@ -118,6 +118,10 @@ export const authOptions: NextAuthConfig = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  pages: {
+    signIn: "/auth/signin",
+    signOut: "/auth/signout",
+  },
 };
 
 // getServerSession is not available in NextAuth v5

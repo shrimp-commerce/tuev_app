@@ -3,6 +3,8 @@
 import { useState } from "react";
 
 import { api } from "~/trpc/react";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 
 export function LatestWorkLog() {
   const latestWorkLog = api.workLog.getLatest.useQuery();
@@ -83,38 +85,30 @@ export function LatestWorkLog() {
         }}
         className="flex flex-col gap-2"
       >
-        <input
+        <Input
           type="text"
           placeholder="Title"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-full bg-white/10 px-4 py-2 text-white"
         />
-        <input
+        <Input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full rounded-full bg-white/10 px-4 py-2 text-white"
         />
-        <input
+        <Input
           type="time"
           value={startTime}
           onChange={(e) => setStartTime(e.target.value)}
-          className="w-full rounded-full bg-white/10 px-4 py-2 text-white"
         />
-        <input
+        <Input
           type="time"
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
-          className="w-full rounded-full bg-white/10 px-4 py-2 text-white"
         />
-        <button
-          type="submit"
-          className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
-          disabled={createWorkLog.isPending}
-        >
+        <Button type="submit" disabled={createWorkLog.isPending}>
           {createWorkLog.isPending ? "Submitting..." : "Submit"}
-        </button>
+        </Button>
       </form>
     </div>
   );
