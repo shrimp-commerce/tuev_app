@@ -1,0 +1,45 @@
+{
+  "SignUp": {
+    "title": "Registrieren",
+    "name": "Name",
+    "email": "E-Mail",
+    "role": "Rolle",
+    "user": "Benutzer",
+    "admin": "Admin",
+    "signupPassword": "Registrierungs-Passwort",
+    "password": "Passwort",
+    "signingUp": "Registrierung...",
+    "signUp": "Registrieren",
+    "signUpSuccessful": "Registrierung erfolgreich! Sie können sich jetzt anmelden.",
+    "signUpFailed": "Registrierung fehlgeschlagen",
+    "networkError": "Netzwerkfehler"
+  },
+  "SignOut": {
+    "title": "Abmelden",
+    "signedOutMessage": "Sie wurden abgemeldet. Danke für die Nutzung der App!",
+    "signInAgain": "Erneut anmelden"
+  },
+  "HomePage": {
+    "title": "Hallo Welt!",
+    "mainHeading": "Zeiterfassungs-App",
+    "loggedInAs": "Angemeldet als {name}",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "latestWorkLog": "Ihr letzter Arbeitszeiteintrag: {description}",
+    "dateLabel": "Datum",
+    "startTimeLabel": "Startzeit",
+    "endTimeLabel": "Endzeit",
+    "noValue": "-",
+    "noWorkLogs": "Sie haben noch keine Arbeitszeiteinträge.",
+    "workLogTitlePlaceholder": "Titel",
+    "submitting": "Wird gesendet...",
+    "submit": "Senden"
+  },
+  "SignIn": {
+    "title": "Anmelden",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "invalidCredentials": "Ungültige Zugangsdaten"
+  }
+}

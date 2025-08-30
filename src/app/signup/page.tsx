@@ -1,8 +1,9 @@
-// TODO: remove if we don't need signup: anymore, warning this was AI generated, don't care currently
 "use client";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export default function SignupForm() {
+  const t = useTranslations("SignUp");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,11 +48,11 @@ export default function SignupForm() {
       onSubmit={handleSubmit}
       className="mx-auto max-w-md rounded bg-white p-6 shadow"
     >
-      <h2 className="mb-4 text-2xl font-bold">Sign Up</h2>
-      {error && <div className="mb-2 text-red-600">{error}</div>}
-      {success && <div className="mb-2 text-green-600">{success}</div>}
+      <h2 className="mb-4 text-2xl font-bold">{t("title")}</h2>
+      {error && <div className="mb-2 text-red-600">{t(error)}</div>}
+      {success && <div className="mb-2 text-green-600">{t(success)}</div>}
       <div className="mb-4">
-        <label className="mb-1 block font-medium">Name</label>
+        <label className="mb-1 block font-medium">{t("name")}</label>
         <input
           type="text"
           value={name}
@@ -61,7 +62,7 @@ export default function SignupForm() {
         />
       </div>
       <div className="mb-4">
-        <label className="mb-1 block font-medium">Email</label>
+        <label className="mb-1 block font-medium">{t("email")}</label>
         <input
           type="email"
           value={email}
@@ -71,18 +72,18 @@ export default function SignupForm() {
         />
       </div>
       <div className="mb-4">
-        <label className="mb-1 block font-medium">Role</label>
+        <label className="mb-1 block font-medium">{t("role")}</label>
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
           className="w-full rounded border px-3 py-2"
         >
-          <option value="USER">User</option>
-          <option value="ADMIN">Admin</option>
+          <option value="USER">{t("user")}</option>
+          <option value="ADMIN">{t("admin")}</option>
         </select>
       </div>
       <div className="mb-4">
-        <label className="mb-1 block font-medium">Signup Password</label>
+        <label className="mb-1 block font-medium">{t("signupPassword")}</label>
         <input
           type="password"
           value={signupPassword}
@@ -92,7 +93,7 @@ export default function SignupForm() {
         />
       </div>
       <div className="mb-6">
-        <label className="mb-1 block font-medium">Password</label>
+        <label className="mb-1 block font-medium">{t("password")}</label>
         <input
           type="password"
           value={password}
@@ -106,7 +107,7 @@ export default function SignupForm() {
         className="w-full rounded bg-blue-600 py-2 font-semibold text-white transition hover:bg-blue-700"
         disabled={loading}
       >
-        {loading ? "Signing up..." : "Sign Up"}
+        {loading ? t("signingUp") : t("signUp")}
       </button>
     </form>
   );

@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 
+import { useTranslations } from "next-intl";
 import { api } from "~/trpc/react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 
 export function LatestWorkLog() {
+  const t = useTranslations("HomePage");
   const latestWorkLog = api.workLog.getLatest.useQuery();
 
   const utils = api.useUtils();
@@ -41,33 +43,36 @@ export function LatestWorkLog() {
 
   return (
     <div className="w-full max-w-xs">
+      {t("title")}
       {latestWorkLog ? (
         <p className="truncate">
-          Your most recent work log: {latestWorkLog?.data?.description}
+          {t("latestWorkLog", {
+            description: latestWorkLog?.data?.description ?? "",
+          })}
           <br />
-          date:{" "}
+          {t("dateLabel")}:{" "}
           {latestWorkLog?.data?.date
             ? new Date(latestWorkLog.data.date).toLocaleDateString()
-            : "-"}
+            : t("noValue")}
           <br />
-          startTime:{" "}
+          {t("startTimeLabel")}:{" "}
           {latestWorkLog?.data?.startTime
             ? new Date(latestWorkLog.data.startTime).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })
-            : "-"}
+            : t("noValue")}
           <br />
-          endTime:{" "}
+          {t("endTimeLabel")}:{" "}
           {latestWorkLog?.data?.endTime
             ? new Date(latestWorkLog.data.endTime).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })
-            : "-"}
+            : t("noValue")}
         </p>
       ) : (
-        <p>You have no work logs yet.</p>
+        <p>{t("noWorkLogs")}</p>
       )}
       <form
         onSubmit={(e) => {
@@ -87,7 +92,7 @@ export function LatestWorkLog() {
       >
         <Input
           type="text"
-          placeholder="Title"
+          placeholder={t("workLogTitlePlaceholder")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
@@ -107,7 +112,7 @@ export function LatestWorkLog() {
           onChange={(e) => setEndTime(e.target.value)}
         />
         <Button type="submit" disabled={createWorkLog.isPending}>
-          {createWorkLog.isPending ? "Submitting..." : "Submit"}
+          {createWorkLog.isPending ? t("submitting") : t("submit")}
         </Button>
       </form>
     </div>

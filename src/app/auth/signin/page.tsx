@@ -1,12 +1,14 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 
 export default function SignInPage() {
+  const t = useTranslations("SignIn");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -32,10 +34,10 @@ export default function SignInPage() {
 
   return (
     <div style={{ maxWidth: 400, margin: "auto", padding: 32 }}>
-      <h1>Sign In</h1>
+      <h1>{t("title")}</h1>
       <form onSubmit={handleSubmit}>
         <label>
-          Username
+          {t("username")}
           <Input
             type="text"
             value={name}
@@ -46,7 +48,7 @@ export default function SignInPage() {
         </label>
         <br />
         <label>
-          Password
+          {t("password")}
           <Input
             type="password"
             value={password}
@@ -55,8 +57,12 @@ export default function SignInPage() {
           />
         </label>
         <br />
-        <Button type="submit">Sign In</Button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        <Button type="submit">{t("signIn")}</Button>
+        {error && (
+          <p style={{ color: "red" }}>
+            {t(error === "Invalid credentials" ? "invalidCredentials" : error)}
+          </p>
+        )}
       </form>
     </div>
   );

@@ -1,0 +1,45 @@
+{
+  "SignUp": {
+    "title": "Sign Up",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "user": "User",
+    "admin": "Admin",
+    "signupPassword": "Signup Password",
+    "password": "Password",
+    "signingUp": "Signing up...",
+    "signUp": "Sign Up",
+    "signUpSuccessful": "Sign up successful! You can now log in.",
+    "signUpFailed": "Sign up failed",
+    "networkError": "Network error"
+  },
+  "SignOut": {
+    "title": "Sign Out",
+    "signedOutMessage": "You have been signed out. Thank you for using the app!",
+    "signInAgain": "Sign In Again"
+  },
+  "HomePage": {
+    "title": "Hello world!",
+    "mainHeading": "Time Tracking app",
+    "loggedInAs": "Logged in as {name}",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "latestWorkLog": "Your most recent work log: {description}",
+    "dateLabel": "Date",
+    "startTimeLabel": "Start time",
+    "endTimeLabel": "End time",
+    "noValue": "-",
+    "noWorkLogs": "You have no work logs yet.",
+    "workLogTitlePlaceholder": "Title",
+    "submitting": "Submitting...",
+    "submit": "Submit"
+  },
+  "SignIn": {
+    "title": "Sign In",
+    "username": "Username",
+    "password": "Password",
+    "signIn": "Sign In",
+    "invalidCredentials": "Invalid credentials"
+  }
+}
