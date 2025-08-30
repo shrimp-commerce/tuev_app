@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { Geist } from "next/font/google";
 
+import { SessionProvider } from "next-auth/react";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
@@ -16,14 +17,23 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
+import Header from "./Header";
+
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <TRPCReactProvider>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <SessionProvider>
+            <NextIntlClientProvider>
+              <Header />
+              {children}
+            </NextIntlClientProvider>
+          </SessionProvider>
         </TRPCReactProvider>
       </body>
     </html>
