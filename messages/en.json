@@ -32,7 +32,9 @@
     "noWorkLogs": "You have no work logs yet.",
   "description": "Description",
     "submitting": "Submitting...",
-    "submit": "Submit"
+  "submit": "Submit",
+  "workLogsThisMonth": "Work logs for this month",
+  "loading": "Loading..."
   },
   "SignIn": {
     "title": "Sign In",

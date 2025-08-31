@@ -2,19 +2,30 @@
 
 import { useState } from "react";
 
+import type { WorkLog } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { api } from "~/trpc/react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { Separator } from "../../components/ui/separator";
 
 export function LatestWorkLog() {
   const t = useTranslations("HomePage");
-  const latestWorkLog = api.workLog.getLatest.useQuery();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const workLogs = api.workLog.getByMonth.useQuery({ year, month });
 
   const utils = api.useUtils();
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
-  const [startTime, setStartTime] = useState("");
+  // Get current date in yyyy-mm-dd format
+  const nowDate = new Date();
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const initialDate = `${nowDate.getFullYear()}-${pad(nowDate.getMonth() + 1)}-${pad(nowDate.getDate())}`;
+  // Get current time in hh:mm format
+  const initialTime = `${pad(nowDate.getHours())}:${pad(nowDate.getMinutes())}`;
+  const [date, setDate] = useState(initialDate);
+  const [startTime, setStartTime] = useState(initialTime);
   const [endTime, setEndTime] = useState("");
   const createWorkLog = api.workLog.create.useMutation({
     onSuccess: async () => {
@@ -41,38 +52,49 @@ export function LatestWorkLog() {
     return d.toISOString();
   }
 
+  type WorkLogWithFormatted = WorkLog & {
+    formattedDate: string;
+    startTimeFormatted: string;
+    endTimeFormatted: string;
+  };
+  function groupWorkLogsByDate(
+    workLogs: WorkLog[],
+  ): Record<string, WorkLogWithFormatted[]> {
+    return workLogs.reduce<Record<string, WorkLogWithFormatted[]>>(
+      (acc, log) => {
+        // Format date as 'Monday, 5. August 2025' in user's locale
+        const dateObj = new Date(log.date);
+        const dayName = dateObj.toLocaleDateString(undefined, {
+          weekday: "long",
+        });
+        const day = dateObj.getDate();
+        const monthName = dateObj.toLocaleDateString(undefined, {
+          month: "long",
+        });
+        const year = dateObj.getFullYear();
+        const formattedDate = `${dayName}, ${day}. ${monthName} ${year}`;
+        // Format start and end time in user's locale and attach to log
+        const formattedLog: WorkLogWithFormatted = {
+          ...log,
+          formattedDate,
+          startTimeFormatted: new Date(log.startTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          endTimeFormatted: new Date(log.endTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        (acc[formattedDate] ??= []).push(formattedLog);
+        return acc;
+      },
+      {},
+    );
+  }
+
   return (
-    <div className="w-full max-w-xs">
-      {latestWorkLog ? (
-        <p className="truncate">
-          {t("latestWorkLog", {
-            description: latestWorkLog?.data?.description ?? "",
-          })}
-          <br />
-          {t("dateLabel")}:{" "}
-          {latestWorkLog?.data?.date
-            ? new Date(latestWorkLog.data.date).toLocaleDateString()
-            : t("noValue")}
-          <br />
-          {t("startTimeLabel")}:{" "}
-          {latestWorkLog?.data?.startTime
-            ? new Date(latestWorkLog.data.startTime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : t("noValue")}
-          <br />
-          {t("endTimeLabel")}:{" "}
-          {latestWorkLog?.data?.endTime
-            ? new Date(latestWorkLog.data.endTime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : t("noValue")}
-        </p>
-      ) : (
-        <p>{t("noWorkLogs")}</p>
-      )}
+    <div className="mx-auto w-full max-w-md">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -87,7 +109,7 @@ export function LatestWorkLog() {
             endTime: endTimeISO,
           });
         }}
-        className="flex flex-col gap-2"
+        className="mb-6 flex flex-col gap-2"
       >
         <Input
           type="text"
@@ -114,6 +136,37 @@ export function LatestWorkLog() {
           {createWorkLog.isPending ? t("submitting") : t("submit")}
         </Button>
       </form>
+      <Separator className="my-4" />
+      <h2 className="mb-4 text-lg font-bold">{t("workLogsThisMonth")}</h2>
+      <div className="mb-6 flex flex-col gap-4">
+        {workLogs.isLoading ? (
+          <div className="animate-pulse text-gray-400">{t("loading")}</div>
+        ) : workLogs.data && workLogs.data.length > 0 ? (
+          Object.entries(groupWorkLogsByDate(workLogs.data)).map(
+            ([date, logs]) => (
+              <div key={date}>
+                <h3 className="text-md font-bold text-gray-700">{date}</h3>
+                <Separator className="my-2" />
+                {logs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="mb-2 flex items-center gap-2 rounded border bg-white px-2 py-1 shadow-sm"
+                  >
+                    <span className="text-sm whitespace-nowrap text-gray-500">
+                      {log.startTimeFormatted} - {log.endTimeFormatted}
+                    </span>
+                    <span className="truncate text-gray-800">
+                      {log.description}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ),
+          )
+        ) : (
+          <p className="text-gray-500">{t("noWorkLogs")}</p>
+        )}
+      </div>
     </div>
   );
 }

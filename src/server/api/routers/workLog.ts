@@ -3,6 +3,28 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const workLogRouter = createTRPCRouter({
+  getByMonth: protectedProcedure
+    .input(
+      z.object({
+        year: z.number().int().min(1970),
+        month: z.number().int().min(1).max(12),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const start = new Date(Date.UTC(input.year, input.month - 1, 1, 0, 0, 0));
+      const end = new Date(Date.UTC(input.year, input.month, 1, 0, 0, 0));
+      return ctx.db.workLog.findMany({
+        where: {
+          createdBy: { id: ctx.session.user.id },
+          date: {
+            gte: start,
+            lt: end,
+          },
+        },
+        orderBy: { date: "desc" },
+      });
+    }),
+
   create: protectedProcedure
     .input(
       z.object({

@@ -32,7 +32,9 @@
     "noWorkLogs": "Sie haben noch keine Arbeitszeiteinträge.",
   "description": "Beschreibung",
     "submitting": "Wird gesendet...",
-    "submit": "Senden"
+  "submit": "Senden",
+  "workLogsThisMonth": "Arbeitszeiteinträge diesen Monat",
+  "loading": "Lädt..."
   },
   "SignIn": {
     "title": "Anmelden",
