@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 
 import type { WorkLog } from "@prisma/client";
+import { AlertCircleIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { api } from "~/trpc/react";
+import { Alert, AlertTitle } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Separator } from "../../components/ui/separator";
@@ -30,6 +32,7 @@ export function LatestWorkLog() {
   const [date, setDate] = useState(initialDate);
   const [startTime, setStartTime] = useState(initialTime);
   const [endTime, setEndTime] = useState("");
+  const [error, setError] = useState("");
   const createWorkLog = api.workLog.create.useMutation({
     onSuccess: async () => {
       await utils.workLog.invalidate();
@@ -130,6 +133,11 @@ export function LatestWorkLog() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          if (!description || !date || !startTime || !endTime) {
+            setError("Please fill in all fields.");
+            return;
+          }
+          setError("");
           // Compose UTC ISO strings
           const dateISO = date ? new Date(date).toISOString() : "";
           const startTimeISO = toUTCISOString(date, startTime);
@@ -164,6 +172,12 @@ export function LatestWorkLog() {
           value={endTime}
           onChange={(e) => setEndTime(e.target.value)}
         />
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircleIcon />
+            <AlertTitle>{error}</AlertTitle>
+          </Alert>
+        )}
         <Button type="submit" disabled={createWorkLog.isPending}>
           {createWorkLog.isPending ? t("submitting") : t("submit")}
         </Button>
