@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { WorkLog } from "@prisma/client";
 import { useTranslations } from "next-intl";
@@ -39,6 +39,30 @@ export function LatestWorkLog() {
       setEndTime("");
     },
   });
+
+  // prefetch to make change of month feel instant
+  useEffect(() => {
+    let prevMonth = displayMonth - 1;
+    let prevYear = displayYear;
+    if (prevMonth < 1) {
+      prevMonth = 12;
+      prevYear -= 1;
+    }
+    let nextMonth = displayMonth + 1;
+    let nextYear = displayYear;
+    if (nextMonth > 12) {
+      nextMonth = 1;
+      nextYear += 1;
+    }
+    void utils.workLog.getByMonth.prefetch({
+      year: prevYear,
+      month: prevMonth,
+    });
+    void utils.workLog.getByMonth.prefetch({
+      year: nextYear,
+      month: nextMonth,
+    });
+  }, [displayMonth, displayYear, utils]);
 
   function toUTCISOString(dateStr: string, timeStr: string) {
     if (!dateStr || !timeStr) return "";
