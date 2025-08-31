@@ -12,9 +12,12 @@ import { Separator } from "../../components/ui/separator";
 export function LatestWorkLog() {
   const t = useTranslations("HomePage");
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
-  const workLogs = api.workLog.getByMonth.useQuery({ year, month });
+  const [displayYear, setDisplayYear] = useState(now.getFullYear());
+  const [displayMonth, setDisplayMonth] = useState(now.getMonth() + 1);
+  const workLogs = api.workLog.getByMonth.useQuery({
+    year: displayYear,
+    month: displayMonth,
+  });
 
   const utils = api.useUtils();
   const [description, setDescription] = useState("");
@@ -93,6 +96,11 @@ export function LatestWorkLog() {
     );
   }
 
+  const getMonthName = (month: number) =>
+    new Date(displayYear, month - 1, 1).toLocaleDateString(undefined, {
+      month: "long",
+    });
+
   return (
     <div className="mx-auto w-full max-w-md">
       <form
@@ -137,7 +145,43 @@ export function LatestWorkLog() {
         </Button>
       </form>
       <Separator className="my-4" />
-      <h2 className="mb-4 text-lg font-bold">{t("workLogsThisMonth")}</h2>
+      <div className="mb-2 flex items-center justify-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          aria-label="Previous month"
+          onClick={() => {
+            if (displayMonth === 1) {
+              setDisplayMonth(12);
+              setDisplayYear(displayYear - 1);
+            } else {
+              setDisplayMonth(displayMonth - 1);
+            }
+          }}
+        >
+          &#8592;
+        </Button>
+        <span className="text-lg font-bold">
+          {getMonthName(displayMonth)} {displayYear}
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          aria-label="Next month"
+          onClick={() => {
+            if (displayMonth === 12) {
+              setDisplayMonth(1);
+              setDisplayYear(displayYear + 1);
+            } else {
+              setDisplayMonth(displayMonth + 1);
+            }
+          }}
+        >
+          &#8594;
+        </Button>
+      </div>
       <div className="mb-6 flex flex-col gap-4">
         {workLogs.isLoading ? (
           <div className="animate-pulse text-gray-400">{t("loading")}</div>
