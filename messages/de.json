@@ -1,4 +1,11 @@
 {
+  "Header": {
+    "loggedInAs": "Angemeldet als {name}",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "toEmployeeView": "Zur Mitarbeiteransicht",
+    "toAdminPanel": "Zum Admin-Bereich"
+  },
   "SignUp": {
     "title": "Registrieren",
     "name": "Name",
@@ -21,19 +28,16 @@
   },
   "HomePage": {
     "mainHeading": "Zeiterfassungs-App",
-    "loggedInAs": "Angemeldet als {name}",
-    "signIn": "Anmelden",
-    "signOut": "Abmelden",
     "latestWorkLog": "Ihr letzter Arbeitszeiteintrag: {description}",
     "dateLabel": "Datum",
     "startTimeLabel": "Startzeit",
     "endTimeLabel": "Endzeit",
     "noValue": "-",
     "noWorkLogs": "Sie haben noch keine Arbeitszeiteinträge.",
-  "description": "Beschreibung",
+    "description": "Beschreibung",
     "submitting": "Wird gesendet...",
-  "submit": "Senden",
-  "loading": "Lädt..."
+    "submit": "Eintrag hinzufügen",
+    "loading": "Lädt..."
   },
   "SignIn": {
     "title": "Anmelden",

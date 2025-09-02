@@ -15,15 +15,13 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      isAdmin?: boolean;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    isAdmin?: boolean;
+  }
 }
 
 /**
@@ -46,6 +44,18 @@ export const authOptions: NextAuthConfig = {
     }) => {
       if (session?.user) {
         session.user.id = token.sub!;
+        // Add isAdmin boolean to session.user
+        if (token.sub) {
+          // Import db dynamically to avoid issues in edge runtimes
+          const { db } = await import("~/server/db");
+          const user = await db.user.findUnique({
+            where: { id: token.sub },
+            select: { role: true },
+          });
+          session.user.isAdmin = user?.role === "ADMIN";
+        } else {
+          session.user.isAdmin = false;
+        }
       }
       return session;
     },

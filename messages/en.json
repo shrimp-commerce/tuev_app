@@ -1,4 +1,11 @@
 {
+  "Header": {
+    "loggedInAs": "Logged in as {name}",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "toEmployeeView": "To employee view",
+    "toAdminPanel": "To admin panel"
+  },
   "SignUp": {
     "title": "Sign Up",
     "name": "Name",
@@ -21,19 +28,16 @@
   },
   "HomePage": {
     "mainHeading": "Time Tracking app",
-    "loggedInAs": "Logged in as {name}",
-    "signIn": "Sign in",
-    "signOut": "Sign out",
     "latestWorkLog": "Your most recent work log: {description}",
     "dateLabel": "Date",
     "startTimeLabel": "Start time",
     "endTimeLabel": "End time",
     "noValue": "-",
     "noWorkLogs": "You have no work logs yet.",
-  "description": "Description",
+    "description": "Description",
     "submitting": "Submitting...",
-  "submit": "Submit",
-  "loading": "Loading..."
+    "submit": "Add Entry",
+    "loading": "Loading..."
   },
   "SignIn": {
     "title": "Sign In",
