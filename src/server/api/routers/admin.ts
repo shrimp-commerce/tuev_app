@@ -5,7 +5,12 @@ export const adminRouter = createTRPCRouter({
   getAllWorklogsForMonth: protectedProcedure
     .input(z.object({ year: z.number(), month: z.number() }))
     .query(async ({ ctx, input }) => {
-      if (!ctx.session.user.isAdmin) {
+      const userId = ctx.session.user.id;
+      const user = await ctx.db.user.findUnique({
+        where: { id: userId },
+        select: { role: true },
+      });
+      if (user?.role !== "ADMIN") {
         throw new Error("Not authorized");
       }
 
