@@ -45,5 +45,10 @@
     "password": "Passwort",
     "signIn": "Anmelden",
     "invalidCredentials": "Ungültige Zugangsdaten"
+  },
+  "AdminPanel": {
+    "noWorkLogsForMonth": "Keine Arbeitszeiteinträge für diesen Monat.",
+    "loading": "Lädt...",
+    "errorLoadingWorklogs": "Fehler beim Laden der Arbeitszeiteinträge."
   }
 }

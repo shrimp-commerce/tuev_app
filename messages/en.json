@@ -45,5 +45,10 @@
     "password": "Password",
     "signIn": "Sign In",
     "invalidCredentials": "Invalid credentials"
+  },
+  "AdminPanel": {
+    "noWorkLogsForMonth": "No work logs for this month.",
+    "loading": "Loading...",
+    "errorLoadingWorklogs": "Error loading work logs."
   }
 }
