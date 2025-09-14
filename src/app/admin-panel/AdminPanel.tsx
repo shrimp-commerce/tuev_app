@@ -1,6 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { api } from "~/trpc/react";
+import { AddTaskDialog } from "../../components/addTaskDialog";
 import { Button } from "../../components/ui/button";
 import { AdminWorkLogsAccordion } from "./AdminWorkLogsAccordion";
 
@@ -18,6 +21,7 @@ export default function AdminPanel() {
     <main className="flex min-h-screen flex-col">
       <div className="container flex flex-col items-center gap-12 px-4 py-16">
         <h1 className="text-4xl font-extrabold tracking-tight">Admin Panel</h1>
+        <AddTaskSection />
         <div className="mb-2 flex items-center justify-center gap-2">
           <Button
             type="button"
@@ -58,5 +62,47 @@ export default function AdminPanel() {
         <AdminWorkLogsAccordion year={displayYear} month={displayMonth} />
       </div>
     </main>
+  );
+}
+
+function AddTaskSection() {
+  const [open, setOpen] = useState(false);
+  const utils = api.useUtils();
+  const t = useTranslations("AdminPanel");
+  const createTask = api.adminTask.create.useMutation({
+    onSuccess: async () => {
+      await utils.adminTask.invalidate();
+      setOpen(false);
+    },
+  });
+
+  function handleAddTask(values: {
+    date: string;
+    startTime: string;
+    endTime: string;
+    description: string;
+    assignedToId: string;
+  }) {
+    createTask.mutate({
+      date: new Date(values.date),
+      startTime: new Date(`${values.date}T${values.startTime}`),
+      endTime: new Date(`${values.date}T${values.endTime}`),
+      description: values.description,
+      assignedToId: values.assignedToId,
+    });
+  }
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)} variant="default">
+        {t("addTaskButton")}
+      </Button>
+      <AddTaskDialog
+        open={open}
+        onOpenChange={setOpen}
+        onSubmit={handleAddTask}
+        isPending={createTask.isPending}
+      />
+    </>
   );
 }

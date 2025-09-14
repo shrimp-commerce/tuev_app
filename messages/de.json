@@ -59,6 +59,13 @@
     "confirm": "Bestätigen"
   },
   "AdminPanel": {
+    "addTaskTitle": "Neue Aufgabe hinzufügen",
+    "taskDate": "Datum",
+    "taskStartTime": "Startzeit",
+    "taskEndTime": "Endzeit",
+    "taskDescription": "Beschreibung",
+    "taskAssignedToId": "Zugewiesen an",
+    "addTaskButton": "Aufgabe hinzufügen",
     "noWorkLogsForMonth": "Keine Arbeitszeiteinträge für diesen Monat.",
     "loading": "Lädt...",
     "errorLoadingWorklogs": "Fehler beim Laden der Arbeitszeiteinträge."

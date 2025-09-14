@@ -28,4 +28,24 @@ export const adminRouter = createTRPCRouter({
         },
       });
     }),
+
+  getAllUsers: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    const user = await ctx.db.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    if (user?.role !== "ADMIN") {
+      throw new Error("Not authorized");
+    }
+    return ctx.db.user.findMany({
+      where: { role: "USER" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+      },
+    });
+  }),
 });

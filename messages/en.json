@@ -59,6 +59,13 @@
     "confirm": "Confirm"
   },
   "AdminPanel": {
+    "addTaskTitle": "Add New Task",
+    "taskDate": "Date",
+    "taskStartTime": "Start Time",
+    "taskEndTime": "End Time",
+    "taskDescription": "Description",
+    "taskAssignedToId": "Assigned To",
+    "addTaskButton": "Add Task",
     "noWorkLogsForMonth": "No work logs for this month.",
     "loading": "Loading...",
     "errorLoadingWorklogs": "Error loading work logs."
