@@ -37,7 +37,14 @@
     "description": "Beschreibung",
     "submitting": "Wird gesendet...",
     "submit": "Eintrag hinzufügen",
-    "loading": "Lädt..."
+  "loading": "Lädt...",
+  "delete": "Löschen",
+  "deleting": "Wird gelöscht...",
+  "confirmDeleteLabel": "Möchten Sie diesen Arbeitszeiteintrag wirklich löschen?",
+  "edit": "Bearbeiten",
+  "editWorkLogTitle": "Arbeitszeiteintrag bearbeiten",
+  "save": "Speichern",
+  "saving": "Speichert..."
   },
   "SignIn": {
     "title": "Anmelden",
@@ -45,6 +52,11 @@
     "password": "Passwort",
     "signIn": "Anmelden",
     "invalidCredentials": "Ungültige Zugangsdaten"
+  },
+  "ConfirmDialog": {
+    "confirmLabel": "Sind Sie sicher?",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen"
   },
   "AdminPanel": {
     "noWorkLogsForMonth": "Keine Arbeitszeiteinträge für diesen Monat.",

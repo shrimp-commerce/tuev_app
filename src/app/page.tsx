@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { auth } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
-import { LatestWorkLog } from "./_components/workLog";
+import { WorkLogs } from "./_components/workLogs";
 
 export default async function Home() {
   const session = await auth();
@@ -16,7 +16,7 @@ export default async function Home() {
             {t("mainHeading")}
           </h1>
 
-          {session?.user && <LatestWorkLog />}
+          {session?.user && <WorkLogs />}
         </div>
       </main>
     </HydrateClient>

@@ -6,13 +6,26 @@ import type { WorkLog } from "@prisma/client";
 import { AlertCircleIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { api } from "~/trpc/react";
+import { ConfirmButton } from "../../components/confirmButton";
+import { EditWorkLogDialog } from "../../components/editWorkLogDialog";
 import { Alert, AlertTitle } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Separator } from "../../components/ui/separator";
 
-export function LatestWorkLog() {
+export function WorkLogs() {
   const t = useTranslations("HomePage");
+  // State for edit dialog
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editLog, setEditLog] = useState<WorkLogWithFormatted | null>(null);
+  const updateWorkLog = api.workLog.update.useMutation({
+    onSuccess: async () => {
+      await utils.workLog.invalidate();
+      setEditDialogOpen(false);
+      setEditLog(null);
+    },
+  });
+
   const now = new Date();
   const [displayYear, setDisplayYear] = useState(now.getFullYear());
   const [displayMonth, setDisplayMonth] = useState(now.getMonth() + 1);
@@ -23,6 +36,11 @@ export function LatestWorkLog() {
 
   const utils = api.useUtils();
   const [description, setDescription] = useState("");
+  const deleteWorkLog = api.workLog.delete.useMutation({
+    onSuccess: async () => {
+      await utils.workLog.invalidate();
+    },
+  });
   // Get current date in yyyy-mm-dd format
   const nowDate = new Date();
   const pad = (n: number) => n.toString().padStart(2, "0");
@@ -92,13 +110,14 @@ export function LatestWorkLog() {
   ): Record<string, WorkLogWithFormatted[]> {
     return workLogs.reduce<Record<string, WorkLogWithFormatted[]>>(
       (acc, log) => {
-        // Format date as 'Monday, 5. August 2025' in user's locale
         const dateObj = new Date(log.date);
-        const dayName = dateObj.toLocaleDateString(undefined, {
+        // TODO: Use user's locale
+        const dayName = dateObj.toLocaleDateString("de", {
           weekday: "long",
         });
         const day = dateObj.getDate();
-        const monthName = dateObj.toLocaleDateString(undefined, {
+        // TODO: Use user's locale
+        const monthName = dateObj.toLocaleDateString("de", {
           month: "long",
         });
         const year = dateObj.getFullYear();
@@ -107,14 +126,10 @@ export function LatestWorkLog() {
         const formattedLog: WorkLogWithFormatted = {
           ...log,
           formattedDate,
-          startTimeFormatted: new Date(log.startTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          endTimeFormatted: new Date(log.endTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          startTimeFormatted: new Date(log.startTime)
+            .toISOString()
+            .slice(11, 16),
+          endTimeFormatted: new Date(log.endTime).toISOString().slice(11, 16),
         };
         (acc[formattedDate] ??= []).push(formattedLog);
         return acc;
@@ -240,6 +255,83 @@ export function LatestWorkLog() {
                     <span className="truncate text-gray-800">
                       {log.description}
                     </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setEditDialogOpen(true);
+                        setEditLog(log);
+                      }}
+                      disabled={deleteWorkLog.isPending}
+                    >
+                      {t("edit")}
+                    </Button>
+                    <ConfirmButton
+                      label={t("delete")}
+                      confirmLabel={t("confirmDeleteLabel")}
+                      onConfirm={() => deleteWorkLog.mutate({ id: log.id })}
+                      disabled={deleteWorkLog.isPending}
+                    />
+                    {/* Edit WorkLog Dialog */}
+                    {editLog && (
+                      <EditWorkLogDialog
+                        open={editDialogOpen}
+                        onOpenChange={(open: boolean) => {
+                          setEditDialogOpen(open);
+                          if (!open) setEditLog(null);
+                        }}
+                        initialValues={{
+                          date:
+                            (() => {
+                              if (typeof editLog.date === "string") {
+                                // If ISO string, extract date part
+                                const dateStr: string = editLog.date ?? "";
+                                const isoMatch = /^\d{4}-\d{2}-\d{2}/.exec(
+                                  dateStr,
+                                );
+                                return isoMatch ? isoMatch[0] : "";
+                              }
+                              if (editLog.date instanceof Date) {
+                                return editLog.date.toISOString().split("T")[0];
+                              }
+                              return "";
+                            })() ?? "",
+                          startTime: new Date(editLog.startTime)
+                            .toISOString()
+                            .slice(11, 16),
+                          endTime: new Date(editLog.endTime)
+                            .toISOString()
+                            .slice(11, 16),
+                          description: editLog.description,
+                        }}
+                        onSubmit={({
+                          date,
+                          startTime,
+                          endTime,
+                          description,
+                        }: {
+                          date: string;
+                          startTime: string;
+                          endTime: string;
+                          description: string;
+                        }) => {
+                          // Compose UTC ISO strings
+                          const dateISO = date
+                            ? new Date(date).toISOString()
+                            : "";
+                          const startTimeISO = toUTCISOString(date, startTime);
+                          const endTimeISO = toUTCISOString(date, endTime);
+                          updateWorkLog.mutate({
+                            id: editLog.id,
+                            date: dateISO,
+                            startTime: startTimeISO,
+                            endTime: endTimeISO,
+                            description,
+                          });
+                        }}
+                        isPending={updateWorkLog.isPending}
+                      />
+                    )}
                   </div>
                 ))}
               </div>

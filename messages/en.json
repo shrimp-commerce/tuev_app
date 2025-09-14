@@ -37,7 +37,14 @@
     "description": "Description",
     "submitting": "Submitting...",
     "submit": "Add Entry",
-    "loading": "Loading..."
+  "loading": "Loading...",
+  "delete": "Delete",
+  "deleting": "Deleting...",
+  "confirmDeleteLabel": "Are you sure you want to delete this worklog?",
+  "edit": "Edit",
+  "editWorkLogTitle": "Edit Worklog",
+  "save": "Save",
+  "saving": "Saving..."
   },
   "SignIn": {
     "title": "Sign In",
@@ -45,6 +52,11 @@
     "password": "Password",
     "signIn": "Sign In",
     "invalidCredentials": "Invalid credentials"
+  },
+  "ConfirmDialog": {
+    "confirmLabel": "Are you sure?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "AdminPanel": {
     "noWorkLogsForMonth": "No work logs for this month.",
