@@ -30,6 +30,7 @@ model WorkLog {
 
 model Task {
     id          Int      @id @default(autoincrement())
+    title       String
     date        DateTime
     startTime   DateTime
     endTime     DateTime
