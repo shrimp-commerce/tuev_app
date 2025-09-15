@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { AddTaskDialog } from "../../components/addTaskDialog";
+import TaskList from "../../components/taskList";
 import { Button } from "../../components/ui/button";
 import { AdminWorkLogsAccordion } from "./AdminWorkLogsAccordion";
 
@@ -22,6 +23,7 @@ export default function AdminPanel() {
       <div className="container flex flex-col items-center gap-12 px-4 py-16">
         <h1 className="text-4xl font-extrabold tracking-tight">Admin Panel</h1>
         <AddTaskSection />
+        <TaskList />
         <div className="mb-2 flex items-center justify-center gap-2">
           <Button
             type="button"
@@ -77,6 +79,7 @@ function AddTaskSection() {
   });
 
   function handleAddTask(values: {
+    title: string;
     date: string;
     startTime: string;
     endTime: string;
@@ -84,6 +87,7 @@ function AddTaskSection() {
     assignedToId: string;
   }) {
     createTask.mutate({
+      title: values.title,
       date: new Date(values.date),
       startTime: new Date(`${values.date}T${values.startTime}`),
       endTime: new Date(`${values.date}T${values.endTime}`),

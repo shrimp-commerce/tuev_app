@@ -22,6 +22,7 @@ export interface AddTaskDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (values: {
+    title: string;
     date: string;
     startTime: string;
     endTime: string;
@@ -38,6 +39,7 @@ export function AddTaskDialog({
   isPending,
 }: AddTaskDialogProps) {
   const t = useTranslations("AdminPanel");
+  const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -48,7 +50,7 @@ export function AddTaskDialog({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSubmit({ date, startTime, endTime, description, assignedToId });
+    onSubmit({ title, date, startTime, endTime, description, assignedToId });
   }
 
   return (
@@ -60,6 +62,13 @@ export function AddTaskDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <Input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={t("taskTitle", { default: "Title" })}
+            required
+          />
           <Input
             type="date"
             value={date}

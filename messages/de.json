@@ -60,6 +60,7 @@
   },
   "AdminPanel": {
     "addTaskTitle": "Neue Aufgabe hinzufügen",
+    "taskTitle": "Titel",
     "taskDate": "Datum",
     "taskStartTime": "Startzeit",
     "taskEndTime": "Endzeit",

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 const taskInput = z.object({
+  title: z.string(),
   date: z.coerce.date(),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
