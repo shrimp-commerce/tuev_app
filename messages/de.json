@@ -70,5 +70,15 @@
     "noWorkLogsForMonth": "Keine Arbeitszeiteinträge für diesen Monat.",
     "loading": "Lädt...",
     "errorLoadingWorklogs": "Fehler beim Laden der Arbeitszeiteinträge."
+  },
+  "TaskList": {
+    "loading": "Aufgaben werden geladen...",
+    "errorLoadingTasks": "Fehler beim Laden der Aufgaben",
+    "unknownError": "Unbekannter Fehler",
+    "taskTitle": "Titel",
+    "taskDescription": "Beschreibung",
+    "taskCreatedBy": "Erstellt von",
+    "unknown": "Unbekannt",
+    "noTasksFound": "Keine Aufgaben gefunden."
   }
 }

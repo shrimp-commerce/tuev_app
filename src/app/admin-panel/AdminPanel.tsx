@@ -86,9 +86,10 @@ function AddTaskSection() {
     description: string;
     assignedToId: string;
   }) {
+    const utcMidnight = new Date(`${values.date}T00:00:00Z`);
     createTask.mutate({
       title: values.title,
-      date: new Date(values.date),
+      date: utcMidnight,
       startTime: new Date(`${values.date}T${values.startTime}`),
       endTime: new Date(`${values.date}T${values.endTime}`),
       description: values.description,

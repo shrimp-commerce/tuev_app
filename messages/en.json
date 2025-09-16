@@ -70,5 +70,15 @@
     "noWorkLogsForMonth": "No work logs for this month.",
     "loading": "Loading...",
     "errorLoadingWorklogs": "Error loading work logs."
+  },
+  "TaskList": {
+    "loading": "Loading tasks...",
+    "errorLoadingTasks": "Error loading tasks",
+    "unknownError": "Unknown error",
+    "taskTitle": "Title",
+    "taskDescription": "Description",
+    "taskCreatedBy": "Created By",
+    "unknown": "Unknown",
+    "noTasksFound": "No tasks found."
   }
 }

@@ -41,6 +41,27 @@ export const adminTaskRouter = createTRPCRouter({
     });
   }),
 
+  getAllForDay: protectedProcedure
+    .input(z.object({ date: z.coerce.date() }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const user = await ctx.db.user.findUnique({
+        where: { id: userId },
+        select: { role: true },
+      });
+      if (user?.role !== "ADMIN") {
+        throw new Error("Not authorized");
+      }
+      // Find all tasks for the specific day
+      const tasks = await ctx.db.task.findMany({
+        where: {
+          date: input.date,
+        },
+        include: { createdBy: true, assignedTo: true },
+      });
+      return tasks;
+    }),
+
   getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
