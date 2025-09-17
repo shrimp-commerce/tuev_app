@@ -11,16 +11,11 @@ export default async function Home() {
   return (
     <HydrateClient>
       <main className="bg-muted/50 flex min-h-screen flex-col">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <Card className="w-full max-w-2xl p-8 shadow">
-            <CardContent className="flex flex-col items-center gap-8">
-              <h1 className="text-center text-4xl font-extrabold tracking-tight">
-                {t("mainHeading")}
-              </h1>
-              {session?.user && <WorkLogs />}
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="w-full rounded-none border-none p-8 shadow-none">
+          <CardContent className="flex flex-col gap-8 p-0">
+            {session?.user && <WorkLogs />}
+          </CardContent>
+        </Card>
       </main>
     </HydrateClient>
   );

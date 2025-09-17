@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { api } from "~/trpc/react";
@@ -15,6 +16,26 @@ export default function AdminPanel() {
   const [displayYear, setDisplayYear] = useState(now.getFullYear());
   const [displayMonth, setDisplayMonth] = useState(now.getMonth() + 1);
 
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  });
+  const handlePrevDay = () => {
+    setSelectedDate((prev) => {
+      const newDate = new Date(prev);
+      newDate.setDate(prev.getDate() - 1);
+      return newDate;
+    });
+  };
+  const handleNextDay = () => {
+    setSelectedDate((prev) => {
+      const newDate = new Date(prev);
+      newDate.setDate(prev.getDate() + 1);
+      return newDate;
+    });
+  };
+
   const getMonthName = (month: number) =>
     new Date(displayYear, month - 1, 1).toLocaleDateString(undefined, {
       month: "long",
@@ -27,17 +48,31 @@ export default function AdminPanel() {
           <h1 className="text-3xl font-bold tracking-tight">
             {t("title", { default: "Admin Panel" })}
           </h1>
-          <div>
-            <AddTaskSection />
-          </div>
         </header>
 
         <Card>
-          <CardContent>
+          <CardContent className="flex flex-col gap-4">
             <h2 className="mb-2 text-xl font-semibold">
               {t("tasksForSelectedDay", { default: "Tasks for selected day" })}
             </h2>
-            <TaskList />
+            <div className="flex items-center justify-between gap-4">
+              <Button variant="outline" onClick={handlePrevDay}>
+                <ArrowLeft />
+              </Button>
+              <span className="text-md font-semibold">
+                {selectedDate.toLocaleDateString("de-DE", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+              <Button variant="outline" onClick={handleNextDay}>
+                <ArrowRight />
+              </Button>
+            </div>
+            <AddTaskSection />
+            <TaskList selectedDate={selectedDate} />
           </CardContent>
         </Card>
 

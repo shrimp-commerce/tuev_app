@@ -131,7 +131,8 @@ export function WorkLogs() {
     });
 
   return (
-    <div className="mx-auto w-full max-w-md">
+    <div className="w-full">
+      <span className="text-md block pb-4">{t("quickTimeTracking")}</span>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -154,25 +155,27 @@ export function WorkLogs() {
         className="mb-6 flex flex-col gap-2"
       >
         <Input
-          type="text"
-          placeholder={t("description")}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <Input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
+        <div className="flex flex-row gap-2">
+          <Input
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+          <Input
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
+        </div>
         <Input
-          type="time"
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-        />
-        <Input
-          type="time"
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
+          type="text"
+          placeholder={t("description")}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
         {error && (
           <Alert variant="destructive">
@@ -232,38 +235,40 @@ export function WorkLogs() {
             ([date, logs]) => (
               <Card key={date} className="mb-4">
                 <CardContent className="py-4">
-                  <h3 className="text-md mb-2 font-bold text-gray-700">
-                    {date}
-                  </h3>
-                  <Separator className="my-2" />
+                  <h3 className="text-sm font-bold">{date}</h3>
+                  <Separator className="mb-2" />
                   {logs.map((log) => (
                     <div
                       key={log.id}
-                      className="mb-2 flex items-center gap-2 rounded border bg-white px-2 py-1 shadow-sm"
+                      className="mb-2 flex items-center justify-between gap-2 rounded border bg-white px-2 py-1 shadow-sm"
                     >
-                      <span className="text-sm whitespace-nowrap text-gray-500">
-                        {log.startTimeFormatted} - {log.endTimeFormatted}
-                      </span>
-                      <span className="truncate text-gray-800">
-                        {log.description}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setEditDialogOpen(true);
-                          setEditLog(log);
-                        }}
-                        disabled={deleteWorkLog.isPending}
-                      >
-                        {t("edit")}
-                      </Button>
-                      <ConfirmButton
-                        label={t("delete")}
-                        confirmLabel={t("confirmDeleteLabel")}
-                        onConfirm={() => deleteWorkLog.mutate({ id: log.id })}
-                        disabled={deleteWorkLog.isPending}
-                      />
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="text-sm whitespace-nowrap text-gray-500">
+                          {log.startTimeFormatted} - {log.endTimeFormatted}
+                        </span>
+                        <span className="truncate text-gray-800">
+                          {log.description}
+                        </span>
+                      </div>
+                      <div className="flex flex-shrink-0 flex-row gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditDialogOpen(true);
+                            setEditLog(log);
+                          }}
+                          disabled={deleteWorkLog.isPending}
+                        >
+                          {t("edit")}
+                        </Button>
+                        <ConfirmButton
+                          label={t("delete")}
+                          confirmLabel={t("confirmDeleteLabel")}
+                          onConfirm={() => deleteWorkLog.mutate({ id: log.id })}
+                          disabled={deleteWorkLog.isPending}
+                        />
+                      </div>
                       {/* Edit WorkLog Dialog */}
                       {editLog && (
                         <EditWorkLogDialog

@@ -12,7 +12,7 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="flex w-full items-center justify-between px-6 py-4 shadow">
+    <header className="flex w-full items-center justify-between border-b border-gray-200 px-6 py-4 shadow">
       <div className="text-lg font-semibold">
         {session?.user
           ? t("loggedInAs", { name: session.user.name ?? "" })

@@ -27,7 +27,7 @@
     "signInAgain": "Sign In Again"
   },
   "HomePage": {
-    "mainHeading": "Time Tracking app",
+    "quickTimeTracking": "Quick time tracking",
     "latestWorkLog": "Your most recent work log: {description}",
     "dateLabel": "Date",
     "startTimeLabel": "Start time",

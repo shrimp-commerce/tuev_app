@@ -27,7 +27,7 @@
     "signInAgain": "Erneut anmelden"
   },
   "HomePage": {
-    "mainHeading": "Zeiterfassungs-App",
+    "quickTimeTracking": "Schnelle Zeiterfassung",
     "latestWorkLog": "Ihr letzter Arbeitszeiteintrag: {description}",
     "dateLabel": "Datum",
     "startTimeLabel": "Startzeit",
