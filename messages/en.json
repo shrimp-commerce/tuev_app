@@ -59,6 +59,7 @@
     "confirm": "Confirm"
   },
   "AdminPanel": {
+    "title": "Admin Panel",
     "addTaskTitle": "Add New Task",
     "taskTitle": "Title",
     "taskDate": "Date",
@@ -67,6 +68,10 @@
     "taskDescription": "Description",
     "taskAssignedToId": "Assigned To",
     "addTaskButton": "Add Task",
+    "tasksForSelectedDay": "Tasks for selected day",
+    "workLogs": "Work Logs",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
     "noWorkLogsForMonth": "No work logs for this month.",
     "loading": "Loading...",
     "errorLoadingWorklogs": "Error loading work logs."

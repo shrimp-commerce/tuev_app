@@ -1,6 +1,17 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Alert, AlertTitle } from "../../components/ui/alert";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 
 export default function SignupForm() {
   const t = useTranslations("SignUp");
@@ -46,69 +57,70 @@ export default function SignupForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto max-w-md rounded bg-white p-6 shadow"
+      className="mx-auto max-w-md space-y-6 rounded-lg bg-white p-8 shadow"
     >
-      <h2 className="mb-4 text-2xl font-bold">{t("title")}</h2>
-      {error && <div className="mb-2 text-red-600">{t(error)}</div>}
-      {success && <div className="mb-2 text-green-600">{t(success)}</div>}
-      <div className="mb-4">
-        <label className="mb-1 block font-medium">{t("name")}</label>
-        <input
+      <h2 className="mb-4 text-center text-2xl font-bold">{t("title")}</h2>
+      {error && (
+        <Alert variant="destructive" className="mb-2">
+          <AlertTitle>{t(error)}</AlertTitle>
+        </Alert>
+      )}
+      {success && (
+        <Alert className="mb-2">
+          <AlertTitle>{t(success)}</AlertTitle>
+        </Alert>
+      )}
+      <div className="space-y-2">
+        <label className="block font-medium">{t("name")}</label>
+        <Input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
       </div>
-      <div className="mb-4">
-        <label className="mb-1 block font-medium">{t("email")}</label>
-        <input
+      <div className="space-y-2">
+        <label className="block font-medium">{t("email")}</label>
+        <Input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
       </div>
-      <div className="mb-4">
-        <label className="mb-1 block font-medium">{t("role")}</label>
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className="w-full rounded border px-3 py-2"
-        >
-          <option value="USER">{t("user")}</option>
-          <option value="ADMIN">{t("admin")}</option>
-        </select>
+      <div className="space-y-2">
+        <label className="block font-medium">{t("role")}</label>
+        <Select value={role} onValueChange={setRole}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder={t("role")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="USER">{t("user")}</SelectItem>
+            <SelectItem value="ADMIN">{t("admin")}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <div className="mb-4">
-        <label className="mb-1 block font-medium">{t("signupPassword")}</label>
-        <input
+      <div className="space-y-2">
+        <label className="block font-medium">{t("signupPassword")}</label>
+        <Input
           type="password"
           value={signupPassword}
           onChange={(e) => setSignupPassword(e.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
       </div>
-      <div className="mb-6">
-        <label className="mb-1 block font-medium">{t("password")}</label>
-        <input
+      <div className="space-y-2">
+        <label className="block font-medium">{t("password")}</label>
+        <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
       </div>
-      <button
-        type="submit"
-        className="w-full rounded bg-blue-600 py-2 font-semibold text-white transition hover:bg-blue-700"
-        disabled={loading}
-      >
+      <Button type="submit" className="w-full" disabled={loading}>
         {loading ? t("signingUp") : t("signUp")}
-      </button>
+      </Button>
     </form>
   );
 }

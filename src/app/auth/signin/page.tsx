@@ -4,7 +4,9 @@ import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { Alert, AlertTitle } from "../../../components/ui/alert";
 import { Button } from "../../../components/ui/button";
+import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 
 export default function SignInPage() {
@@ -33,37 +35,47 @@ export default function SignInPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "auto", padding: 32 }}>
-      <h1>{t("title")}</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          {t("username")}
-          <Input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            autoFocus
-          />
-        </label>
-        <br />
-        <label>
-          {t("password")}
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <Button type="submit">{t("signIn")}</Button>
-        {error && (
-          <p style={{ color: "red" }}>
-            {t(error === "Invalid credentials" ? "invalidCredentials" : error)}
-          </p>
-        )}
-      </form>
+    <div className="bg-muted/50 flex min-h-screen items-center justify-center py-8">
+      <Card className="w-full max-w-md p-6 shadow">
+        <CardContent className="space-y-6">
+          <h1 className="mb-4 text-center text-2xl font-bold">{t("title")}</h1>
+          {error && (
+            <Alert variant="destructive">
+              <AlertTitle>
+                {t(
+                  error === "Invalid credentials"
+                    ? "invalidCredentials"
+                    : error,
+                )}
+              </AlertTitle>
+            </Alert>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="block font-medium">{t("username")}</label>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block font-medium">{t("password")}</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full">
+              {t("signIn")}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

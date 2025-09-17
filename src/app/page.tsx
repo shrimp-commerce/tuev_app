@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
-
 import { auth } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
+import { Card, CardContent } from "../components/ui/card";
 import { WorkLogs } from "./_components/workLogs";
 
 export default async function Home() {
@@ -10,13 +10,16 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-col">
-        <div className="container flex flex-col items-center gap-12 px-4 py-16">
-          <h1 className="text-4xl font-extrabold tracking-tight">
-            {t("mainHeading")}
-          </h1>
-
-          {session?.user && <WorkLogs />}
+      <main className="bg-muted/50 flex min-h-screen flex-col">
+        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
+          <Card className="w-full max-w-2xl p-8 shadow">
+            <CardContent className="flex flex-col items-center gap-8">
+              <h1 className="text-center text-4xl font-extrabold tracking-tight">
+                {t("mainHeading")}
+              </h1>
+              {session?.user && <WorkLogs />}
+            </CardContent>
+          </Card>
         </div>
       </main>
     </HydrateClient>

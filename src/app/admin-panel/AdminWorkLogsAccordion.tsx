@@ -9,6 +9,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../../components/ui/accordion";
+import { Alert, AlertTitle } from "../../components/ui/alert";
+import { Card, CardContent } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
 
 import { useTranslations } from "next-intl";
@@ -86,17 +88,29 @@ export function AdminWorkLogsAccordion({
     );
   }
 
-  if (workLogsQuery.isLoading) return <div>{t("loading")}</div>;
-  if (workLogsQuery.isError) return <div>{t("errorLoadingWorklogs")}</div>;
+  if (workLogsQuery.isLoading)
+    return (
+      <Alert>
+        <AlertTitle>{t("loading")}</AlertTitle>
+      </Alert>
+    );
+  if (workLogsQuery.isError)
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>{t("errorLoadingWorklogs")}</AlertTitle>
+      </Alert>
+    );
   return (
     <>
       {Object.keys(grouped).length === 0 ? (
-        <div className="py-8 text-center text-gray-500">
-          {t("noWorkLogsForMonth", {
-            default:
-              "There are no work logs for this month. Please check another month or ensure work logs have been submitted.",
-          })}
-        </div>
+        <Alert className="py-8 text-center">
+          <AlertTitle>
+            {t("noWorkLogsForMonth", {
+              default:
+                "There are no work logs for this month. Please check another month or ensure work logs have been submitted.",
+            })}
+          </AlertTitle>
+        </Alert>
       ) : (
         <Accordion type="multiple" className="w-full">
           {Object.entries(grouped).map(([user, logs]) => (
@@ -105,33 +119,35 @@ export function AdminWorkLogsAccordion({
               <AccordionContent>
                 {Object.entries(groupWorkLogsByDate(logs)).map(
                   ([date, logsForDate]) => (
-                    <div key={date}>
-                      <h3 className="text-md font-bold text-gray-700">
-                        {date}
-                      </h3>
-                      <Separator className="my-2" />
-                      {logsForDate.map((log) => (
-                        <div
-                          key={log.id}
-                          className="mb-2 flex items-center gap-2 rounded border bg-white px-2 py-1 shadow-sm"
-                        >
-                          <span className="text-sm whitespace-nowrap text-gray-500">
-                            {new Date(log.startTime).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}{" "}
-                            -{" "}
-                            {new Date(log.endTime).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                          <span className="truncate text-gray-800">
-                            {log.description}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    <Card key={date} className="mb-4">
+                      <CardContent className="py-4">
+                        <h3 className="text-md mb-2 font-bold text-gray-700">
+                          {date}
+                        </h3>
+                        <Separator className="my-2" />
+                        {logsForDate.map((log) => (
+                          <div
+                            key={log.id}
+                            className="mb-2 flex items-center gap-2 rounded border bg-white px-2 py-1 shadow-sm"
+                          >
+                            <span className="text-sm whitespace-nowrap text-gray-500">
+                              {new Date(log.startTime).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}{" "}
+                              -{" "}
+                              {new Date(log.endTime).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                            <span className="truncate text-gray-800">
+                              {log.description}
+                            </span>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
                   ),
                 )}
               </AccordionContent>

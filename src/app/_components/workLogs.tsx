@@ -10,6 +10,7 @@ import { ConfirmButton } from "../../components/confirmButton";
 import { EditWorkLogDialog } from "../../components/editWorkLogDialog";
 import { Alert, AlertTitle } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Separator } from "../../components/ui/separator";
 import { toUTCISOString } from "../../lib/utils";
@@ -223,108 +224,121 @@ export function WorkLogs() {
       </div>
       <div className="mb-6 flex flex-col gap-4">
         {workLogs.isLoading ? (
-          <div className="animate-pulse text-gray-400">{t("loading")}</div>
+          <Alert>
+            <AlertTitle>{t("loading")}</AlertTitle>
+          </Alert>
         ) : workLogs.data && workLogs.data.length > 0 ? (
           Object.entries(groupWorkLogsByDate(workLogs.data)).map(
             ([date, logs]) => (
-              <div key={date}>
-                <h3 className="text-md font-bold text-gray-700">{date}</h3>
-                <Separator className="my-2" />
-                {logs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="mb-2 flex items-center gap-2 rounded border bg-white px-2 py-1 shadow-sm"
-                  >
-                    <span className="text-sm whitespace-nowrap text-gray-500">
-                      {log.startTimeFormatted} - {log.endTimeFormatted}
-                    </span>
-                    <span className="truncate text-gray-800">
-                      {log.description}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setEditDialogOpen(true);
-                        setEditLog(log);
-                      }}
-                      disabled={deleteWorkLog.isPending}
+              <Card key={date} className="mb-4">
+                <CardContent className="py-4">
+                  <h3 className="text-md mb-2 font-bold text-gray-700">
+                    {date}
+                  </h3>
+                  <Separator className="my-2" />
+                  {logs.map((log) => (
+                    <div
+                      key={log.id}
+                      className="mb-2 flex items-center gap-2 rounded border bg-white px-2 py-1 shadow-sm"
                     >
-                      {t("edit")}
-                    </Button>
-                    <ConfirmButton
-                      label={t("delete")}
-                      confirmLabel={t("confirmDeleteLabel")}
-                      onConfirm={() => deleteWorkLog.mutate({ id: log.id })}
-                      disabled={deleteWorkLog.isPending}
-                    />
-                    {/* Edit WorkLog Dialog */}
-                    {editLog && (
-                      <EditWorkLogDialog
-                        open={editDialogOpen}
-                        onOpenChange={(open: boolean) => {
-                          setEditDialogOpen(open);
-                          if (!open) setEditLog(null);
+                      <span className="text-sm whitespace-nowrap text-gray-500">
+                        {log.startTimeFormatted} - {log.endTimeFormatted}
+                      </span>
+                      <span className="truncate text-gray-800">
+                        {log.description}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditDialogOpen(true);
+                          setEditLog(log);
                         }}
-                        initialValues={{
-                          date:
-                            (() => {
-                              if (typeof editLog.date === "string") {
-                                // If ISO string, extract date part
-                                const dateStr: string = editLog.date ?? "";
-                                const isoMatch = /^\d{4}-\d{2}-\d{2}/.exec(
-                                  dateStr,
-                                );
-                                return isoMatch ? isoMatch[0] : "";
-                              }
-                              if (editLog.date instanceof Date) {
-                                return editLog.date.toISOString().split("T")[0];
-                              }
-                              return "";
-                            })() ?? "",
-                          startTime: new Date(editLog.startTime)
-                            .toISOString()
-                            .slice(11, 16),
-                          endTime: new Date(editLog.endTime)
-                            .toISOString()
-                            .slice(11, 16),
-                          description: editLog.description,
-                        }}
-                        onSubmit={({
-                          date,
-                          startTime,
-                          endTime,
-                          description,
-                        }: {
-                          date: string;
-                          startTime: string;
-                          endTime: string;
-                          description: string;
-                        }) => {
-                          // Compose UTC ISO strings
-                          const dateISO = date
-                            ? new Date(date).toISOString()
-                            : "";
-                          const startTimeISO = toUTCISOString(date, startTime);
-                          const endTimeISO = toUTCISOString(date, endTime);
-                          updateWorkLog.mutate({
-                            id: editLog.id,
-                            date: dateISO,
-                            startTime: startTimeISO,
-                            endTime: endTimeISO,
-                            description,
-                          });
-                        }}
-                        isPending={updateWorkLog.isPending}
+                        disabled={deleteWorkLog.isPending}
+                      >
+                        {t("edit")}
+                      </Button>
+                      <ConfirmButton
+                        label={t("delete")}
+                        confirmLabel={t("confirmDeleteLabel")}
+                        onConfirm={() => deleteWorkLog.mutate({ id: log.id })}
+                        disabled={deleteWorkLog.isPending}
                       />
-                    )}
-                  </div>
-                ))}
-              </div>
+                      {/* Edit WorkLog Dialog */}
+                      {editLog && (
+                        <EditWorkLogDialog
+                          open={editDialogOpen}
+                          onOpenChange={(open: boolean) => {
+                            setEditDialogOpen(open);
+                            if (!open) setEditLog(null);
+                          }}
+                          initialValues={{
+                            date:
+                              (() => {
+                                if (typeof editLog.date === "string") {
+                                  // If ISO string, extract date part
+                                  const dateStr: string = editLog.date ?? "";
+                                  const isoMatch = /^\d{4}-\d{2}-\d{2}/.exec(
+                                    dateStr,
+                                  );
+                                  return isoMatch ? isoMatch[0] : "";
+                                }
+                                if (editLog.date instanceof Date) {
+                                  return editLog.date
+                                    .toISOString()
+                                    .split("T")[0];
+                                }
+                                return "";
+                              })() ?? "",
+                            startTime: new Date(editLog.startTime)
+                              .toISOString()
+                              .slice(11, 16),
+                            endTime: new Date(editLog.endTime)
+                              .toISOString()
+                              .slice(11, 16),
+                            description: editLog.description,
+                          }}
+                          onSubmit={({
+                            date,
+                            startTime,
+                            endTime,
+                            description,
+                          }: {
+                            date: string;
+                            startTime: string;
+                            endTime: string;
+                            description: string;
+                          }) => {
+                            // Compose UTC ISO strings
+                            const dateISO = date
+                              ? new Date(date).toISOString()
+                              : "";
+                            const startTimeISO = toUTCISOString(
+                              date,
+                              startTime,
+                            );
+                            const endTimeISO = toUTCISOString(date, endTime);
+                            updateWorkLog.mutate({
+                              id: editLog.id,
+                              date: dateISO,
+                              startTime: startTimeISO,
+                              endTime: endTimeISO,
+                              description,
+                            });
+                          }}
+                          isPending={updateWorkLog.isPending}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
             ),
           )
         ) : (
-          <p className="text-gray-500">{t("noWorkLogs")}</p>
+          <Alert>
+            <AlertTitle>{t("noWorkLogs")}</AlertTitle>
+          </Alert>
         )}
       </div>
     </div>

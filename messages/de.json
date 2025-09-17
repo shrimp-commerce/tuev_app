@@ -59,6 +59,7 @@
     "confirm": "Bestätigen"
   },
   "AdminPanel": {
+    "title": "Admin-Bereich",
     "addTaskTitle": "Neue Aufgabe hinzufügen",
     "taskTitle": "Titel",
     "taskDate": "Datum",
@@ -67,6 +68,10 @@
     "taskDescription": "Beschreibung",
     "taskAssignedToId": "Zugewiesen an",
     "addTaskButton": "Aufgabe hinzufügen",
+    "tasksForSelectedDay": "Aufgaben für den ausgewählten Tag",
+    "workLogs": "Arbeitszeiteinträge",
+    "previousMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
     "noWorkLogsForMonth": "Keine Arbeitszeiteinträge für diesen Monat.",
     "loading": "Lädt...",
     "errorLoadingWorklogs": "Fehler beim Laden der Arbeitszeiteinträge."

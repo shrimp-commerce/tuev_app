@@ -6,9 +6,11 @@ import { api } from "~/trpc/react";
 import { AddTaskDialog } from "../../components/addTaskDialog";
 import TaskList from "../../components/taskList";
 import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
 import { AdminWorkLogsAccordion } from "./AdminWorkLogsAccordion";
 
 export default function AdminPanel() {
+  const t = useTranslations("AdminPanel");
   const now = new Date();
   const [displayYear, setDisplayYear] = useState(now.getFullYear());
   const [displayMonth, setDisplayMonth] = useState(now.getMonth() + 1);
@@ -19,49 +21,73 @@ export default function AdminPanel() {
     });
 
   return (
-    <main className="flex min-h-screen flex-col">
-      <div className="container flex flex-col items-center gap-12 px-4 py-16">
-        <h1 className="text-4xl font-extrabold tracking-tight">Admin Panel</h1>
-        <AddTaskSection />
-        <TaskList />
-        <div className="mb-2 flex items-center justify-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            aria-label="Previous month"
-            onClick={() => {
-              if (displayMonth === 1) {
-                setDisplayMonth(12);
-                setDisplayYear(displayYear - 1);
-              } else {
-                setDisplayMonth(displayMonth - 1);
-              }
-            }}
-          >
-            &#8592;
-          </Button>
-          <span className="text-lg font-bold">
-            {getMonthName(displayMonth)} {displayYear}
-          </span>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            aria-label="Next month"
-            onClick={() => {
-              if (displayMonth === 12) {
-                setDisplayMonth(1);
-                setDisplayYear(displayYear + 1);
-              } else {
-                setDisplayMonth(displayMonth + 1);
-              }
-            }}
-          >
-            &#8594;
-          </Button>
-        </div>
-        <AdminWorkLogsAccordion year={displayYear} month={displayMonth} />
+    <main className="bg-muted/50 min-h-screen w-full px-2 py-8 md:px-8">
+      <div className="mx-auto max-w-5xl space-y-8">
+        <header className="flex flex-col gap-4 border-b pb-4 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("title", { default: "Admin Panel" })}
+          </h1>
+          <div>
+            <AddTaskSection />
+          </div>
+        </header>
+
+        <Card>
+          <CardContent>
+            <h2 className="mb-2 text-xl font-semibold">
+              {t("tasksForSelectedDay", { default: "Tasks for selected day" })}
+            </h2>
+            <TaskList />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  aria-label={t("previousMonth", { default: "Previous month" })}
+                  onClick={() => {
+                    if (displayMonth === 1) {
+                      setDisplayMonth(12);
+                      setDisplayYear(displayYear - 1);
+                    } else {
+                      setDisplayMonth(displayMonth - 1);
+                    }
+                  }}
+                >
+                  &#8592;
+                </Button>
+                <span className="text-lg font-bold">
+                  {getMonthName(displayMonth)} {displayYear}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  aria-label={t("nextMonth", { default: "Next month" })}
+                  onClick={() => {
+                    if (displayMonth === 12) {
+                      setDisplayMonth(1);
+                      setDisplayYear(displayYear + 1);
+                    } else {
+                      setDisplayMonth(displayMonth + 1);
+                    }
+                  }}
+                >
+                  &#8594;
+                </Button>
+              </div>
+              <h2 className="text-xl font-semibold">
+                {t("workLogs", { default: "Work Logs" })}
+              </h2>
+            </div>
+            <AdminWorkLogsAccordion year={displayYear} month={displayMonth} />
+          </CardContent>
+        </Card>
       </div>
     </main>
   );

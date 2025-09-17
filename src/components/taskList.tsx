@@ -2,7 +2,9 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { api } from "../trpc/react";
+import { Alert, AlertTitle } from "./ui/alert";
 import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
 
 const TaskList = () => {
   const t = useTranslations("TaskList");
@@ -43,67 +45,73 @@ const TaskList = () => {
     });
   };
 
-  if (isLoading) return <div>{t("loading")}</div>;
-  if (error)
-    return (
-      <div>
-        {t("errorLoadingTasks")}:{" "}
-        {error instanceof Error ? error.message : t("unknownError")}
-      </div>
-    );
-
   return (
     <div className="flex flex-col gap-4">
-      <div className="mb-4 flex items-center justify-center gap-4">
+      <div className="mb-2 flex items-center justify-center gap-4">
         <Button variant="outline" onClick={handlePrevDay}>
           <ArrowLeft />
         </Button>
         <span className="text-lg font-semibold">
-          {selectedDate.toLocaleDateString()}
+          {selectedDate.toLocaleDateString("de-DE", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
         </span>
         <Button variant="outline" onClick={handleNextDay}>
           <ArrowRight />
         </Button>
       </div>
       <ul className="flex flex-col gap-4">
-        {Array.isArray(data) && data.length > 0 ? (
+        {isLoading ? (
+          <Alert>
+            <AlertTitle>{t("loading")}</AlertTitle>
+          </Alert>
+        ) : error ? (
+          <Alert variant="destructive">
+            <AlertTitle>
+              {t("errorLoadingTasks")}:{" "}
+              {error instanceof Error ? error.message : t("unknownError")}
+            </AlertTitle>
+          </Alert>
+        ) : Array.isArray(data) && data.length > 0 ? (
           data.map((task) => (
-            <li
-              key={task.id}
-              className="rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800"
-            >
-              <div className="mb-1 flex items-center justify-between gap-2">
-                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {task.title}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {task.startTime
-                    ? new Date(task.startTime).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "--"}
-                  {" - "}
-                  {task.endTime
-                    ? new Date(task.endTime).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "--"}
-                </span>
-              </div>
-              <div className="mb-1 text-sm text-gray-700 dark:text-gray-300">
-                {task.assignedTo?.name ?? task.assignedTo?.id ?? t("unknown")}
-              </div>
-              <div className="text-gray-800 dark:text-gray-200">
-                {task.description}
-              </div>
-            </li>
+            <Card key={task.id} className="w-full">
+              <CardContent>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    {task.title}
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {task.startTime
+                      ? new Date(task.startTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "--"}
+                    {" - "}
+                    {task.endTime
+                      ? new Date(task.endTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "--"}
+                  </span>
+                </div>
+                <div className="mb-1 text-sm text-gray-700 dark:text-gray-300">
+                  {task.assignedTo?.name ?? task.assignedTo?.id ?? t("unknown")}
+                </div>
+                <div className="text-gray-800 dark:text-gray-200">
+                  {task.description}
+                </div>
+              </CardContent>
+            </Card>
           ))
         ) : (
-          <li className="text-gray-500 dark:text-gray-400">
-            {t("noTasksFound")}
-          </li>
+          <Alert>
+            <AlertTitle>{t("noTasksFound")}</AlertTitle>
+          </Alert>
         )}
       </ul>
     </div>
