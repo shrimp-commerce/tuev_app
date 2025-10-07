@@ -1,27 +1,22 @@
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { api } from "../trpc/react";
 import { Alert, AlertTitle } from "./ui/alert";
 import { Card, CardContent } from "./ui/card";
+dayjs.extend(utc);
 
 interface TaskListProps {
-  selectedDate: Date;
+  selectedDate: dayjs.Dayjs;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ selectedDate }) => {
   const t = useTranslations("TaskList");
-  // Convert selectedDate to UTC midnight for the query
-  const selectedDateUTC = new Date(
-    Date.UTC(
-      selectedDate.getFullYear(),
-      selectedDate.getMonth(),
-      selectedDate.getDate(),
-      0,
-      0,
-      0,
-      0,
-    ),
-  );
+  const selectedDateUTC = dayjs
+    .utc(selectedDate.format("YYYY-MM-DD"))
+    .startOf("day")
+    .toDate();
   const { data, isLoading, error } = api.adminTask.getAllForDay.useQuery({
     date: selectedDateUTC,
   });
@@ -49,18 +44,10 @@ const TaskList: React.FC<TaskListProps> = ({ selectedDate }) => {
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   {task.startTime
-                    ? new Date(task.startTime).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                    ? dayjs(task.startTime).format("HH:mm")
                     : "--"}
                   {" - "}
-                  {task.endTime
-                    ? new Date(task.endTime).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "--"}
+                  {task.endTime ? dayjs(task.endTime).format("HH:mm") : "--"}
                 </span>
               </div>
               <div className="mb-1 text-sm text-gray-700 dark:text-gray-300">

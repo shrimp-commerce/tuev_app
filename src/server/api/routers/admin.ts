@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -14,8 +15,24 @@ export const adminRouter = createTRPCRouter({
         throw new Error("Not authorized");
       }
 
-      const startDate = new Date(input.year, input.month - 1, 1);
-      const endDate = new Date(input.year, input.month, 0, 23, 59, 59, 999);
+      const startDate = dayjs()
+        .year(input.year)
+        .month(input.month - 1)
+        .date(1)
+        .hour(0)
+        .minute(0)
+        .second(0)
+        .millisecond(0)
+        .toDate();
+      const endDate = dayjs()
+        .year(input.year)
+        .month(input.month)
+        .date(0)
+        .hour(23)
+        .minute(59)
+        .second(59)
+        .millisecond(999)
+        .toDate();
       return ctx.db.workLog.findMany({
         where: {
           date: {

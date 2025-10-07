@@ -3,22 +3,40 @@
 import { useEffect, useState } from "react";
 
 import type { WorkLog } from "@prisma/client";
-import { AlertCircleIcon } from "lucide-react";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/de";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import updateLocale from "dayjs/plugin/updateLocale";
+import utc from "dayjs/plugin/utc";
+import weekday from "dayjs/plugin/weekday";
+import { AlertCircleIcon, CalendarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { api } from "~/trpc/react";
 import { ConfirmButton } from "../../components/confirmButton";
 import { EditWorkLogDialog } from "../../components/editWorkLogDialog";
 import { Alert, AlertTitle } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
+import { Calendar } from "../../components/ui/calendar";
 import { Card, CardContent } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../components/ui/popover";
 import { Separator } from "../../components/ui/separator";
-import { toUTCISOString } from "../../lib/utils";
+dayjs.extend(localizedFormat);
+dayjs.extend(weekday);
+dayjs.extend(updateLocale);
+dayjs.extend(utc);
 
 export function WorkLogs() {
   const t = useTranslations("HomePage");
   // State for edit dialog
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
   const [editLog, setEditLog] = useState<WorkLogWithFormatted | null>(null);
   const updateWorkLog = api.workLog.update.useMutation({
     onSuccess: async () => {
@@ -28,9 +46,9 @@ export function WorkLogs() {
     },
   });
 
-  const now = new Date();
-  const [displayYear, setDisplayYear] = useState(now.getFullYear());
-  const [displayMonth, setDisplayMonth] = useState(now.getMonth() + 1);
+  const now = dayjs();
+  const [displayYear, setDisplayYear] = useState<number>(now.year());
+  const [displayMonth, setDisplayMonth] = useState<number>(now.month() + 1);
   const workLogs = api.workLog.getByMonth.useQuery({
     year: displayYear,
     month: displayMonth,
@@ -43,13 +61,11 @@ export function WorkLogs() {
       await utils.workLog.invalidate();
     },
   });
-  // Get current date in yyyy-mm-dd format
-  const nowDate = new Date();
+  // Use dayjs object for Calendar
+  const nowDate = dayjs();
   const pad = (n: number) => n.toString().padStart(2, "0");
-  const initialDate = `${nowDate.getFullYear()}-${pad(nowDate.getMonth() + 1)}-${pad(nowDate.getDate())}`;
-  // Get current time in hh:mm format
-  const initialTime = `${pad(nowDate.getHours())}:${pad(nowDate.getMinutes())}`;
-  const [date, setDate] = useState(initialDate);
+  const initialTime = `${pad(nowDate.hour())}:${pad(nowDate.minute())}`;
+  const [date, setDate] = useState<Dayjs | undefined>(nowDate);
   const [startTime, setStartTime] = useState(initialTime);
   const [endTime, setEndTime] = useState("");
   const [error, setError] = useState("");
@@ -57,7 +73,7 @@ export function WorkLogs() {
     onSuccess: async () => {
       await utils.workLog.invalidate();
       setDescription("");
-      setDate("");
+      setDate(undefined);
       setStartTime("");
       setEndTime("");
     },
@@ -97,26 +113,18 @@ export function WorkLogs() {
   ): Record<string, WorkLogWithFormatted[]> {
     return workLogs.reduce<Record<string, WorkLogWithFormatted[]>>(
       (acc, log) => {
-        const dateObj = new Date(log.date);
-        // TODO: Use user's locale
-        const dayName = dateObj.toLocaleDateString("de", {
-          weekday: "long",
-        });
-        const day = dateObj.getDate();
-        // TODO: Use user's locale
-        const monthName = dateObj.toLocaleDateString("de", {
-          month: "long",
-        });
-        const year = dateObj.getFullYear();
+        const dateObj = dayjs(log.date).locale("de");
+        const dayName = dateObj.format("dddd");
+        const day = dateObj.date();
+        const monthName = dateObj.format("MMMM");
+        const year = dateObj.year();
         const formattedDate = `${dayName}, ${day}. ${monthName} ${year}`;
         // Format start and end time in user's locale and attach to log
         const formattedLog: WorkLogWithFormatted = {
           ...log,
           formattedDate,
-          startTimeFormatted: new Date(log.startTime)
-            .toISOString()
-            .slice(11, 16),
-          endTimeFormatted: new Date(log.endTime).toISOString().slice(11, 16),
+          startTimeFormatted: dayjs.utc(log.startTime).local().format("HH:mm"),
+          endTimeFormatted: dayjs.utc(log.endTime).local().format("HH:mm"),
         };
         (acc[formattedDate] ??= []).push(formattedLog);
         return acc;
@@ -126,39 +134,85 @@ export function WorkLogs() {
   }
 
   const getMonthName = (month: number) =>
-    new Date(displayYear, month - 1, 1).toLocaleDateString(undefined, {
-      month: "long",
+    dayjs()
+      .year(displayYear)
+      .month(month - 1)
+      .locale("de")
+      .format("MMMM");
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!description || !date || !startTime || !endTime) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    setError("");
+    // Compose UTC ISO strings using dayjs
+    // Combine date and time as local, then convert to UTC ISO
+    const dateISO = date ? date.toISOString() : "";
+    const startTimeISO =
+      date && startTime
+        ? date
+            .hour(Number(startTime.split(":")[0]))
+            .minute(Number(startTime.split(":")[1]))
+            .second(0)
+            .millisecond(0)
+            .utc()
+            .toISOString()
+        : "";
+    const endTimeISO =
+      date && endTime
+        ? date
+            .hour(Number(endTime.split(":")[0]))
+            .minute(Number(endTime.split(":")[1]))
+            .second(0)
+            .millisecond(0)
+            .utc()
+            .toISOString()
+        : "";
+    createWorkLog.mutate({
+      description,
+      date: dateISO,
+      startTime: startTimeISO,
+      endTime: endTimeISO,
     });
+  }
 
   return (
     <div className="w-full">
       <span className="text-md block pb-4">{t("quickTimeTracking")}</span>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!description || !date || !startTime || !endTime) {
-            setError("Please fill in all fields.");
-            return;
-          }
-          setError("");
-          // Compose UTC ISO strings
-          const dateISO = date ? new Date(date).toISOString() : "";
-          const startTimeISO = toUTCISOString(date, startTime);
-          const endTimeISO = toUTCISOString(date, endTime);
-          createWorkLog.mutate({
-            description,
-            date: dateISO,
-            startTime: startTimeISO,
-            endTime: endTimeISO,
-          });
-        }}
-        className="mb-6 flex flex-col gap-2"
-      >
-        <Input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
+      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-2">
+        <div className="flex w-full flex-col gap-3">
+          <Label htmlFor="date" className="px-1">
+            <CalendarIcon size={16} /> {t("dateLabel")}
+          </Label>
+          <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                id="date"
+                className="w-full justify-between font-normal"
+              >
+                {date ? dayjs(date).format("D.M.YYYY") : "Select date"}
+                <CalendarIcon size={16} />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto overflow-hidden p-0"
+              align="start"
+            >
+              <Calendar
+                mode="single"
+                selected={date ? date.toDate() : undefined}
+                captionLayout="dropdown"
+                onSelect={(date) => {
+                  setDate(date ? dayjs(date) : undefined);
+                  setDatePopoverOpen(false);
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
         <div className="flex flex-row gap-2">
           <Input
             type="time"
@@ -289,18 +343,20 @@ export function WorkLogs() {
                                   return isoMatch ? isoMatch[0] : "";
                                 }
                                 if (editLog.date instanceof Date) {
-                                  return editLog.date
-                                    .toISOString()
-                                    .split("T")[0];
+                                  return dayjs(editLog.date).format(
+                                    "YYYY-MM-DD",
+                                  );
                                 }
                                 return "";
                               })() ?? "",
-                            startTime: new Date(editLog.startTime)
-                              .toISOString()
-                              .slice(11, 16),
-                            endTime: new Date(editLog.endTime)
-                              .toISOString()
-                              .slice(11, 16),
+                            startTime: dayjs
+                              .utc(editLog.startTime)
+                              .local()
+                              .format("HH:mm"),
+                            endTime: dayjs
+                              .utc(editLog.endTime)
+                              .local()
+                              .format("HH:mm"),
                             description: editLog.description,
                           }}
                           onSubmit={({
@@ -314,15 +370,30 @@ export function WorkLogs() {
                             endTime: string;
                             description: string;
                           }) => {
-                            // Compose UTC ISO strings
+                            // Compose UTC ISO strings using dayjs
                             const dateISO = date
-                              ? new Date(date).toISOString()
+                              ? dayjs(date).toISOString()
                               : "";
-                            const startTimeISO = toUTCISOString(
-                              date,
-                              startTime,
-                            );
-                            const endTimeISO = toUTCISOString(date, endTime);
+                            const startTimeISO =
+                              date && startTime
+                                ? dayjs(date)
+                                    .hour(Number(startTime.split(":")[0]))
+                                    .minute(Number(startTime.split(":")[1]))
+                                    .second(0)
+                                    .millisecond(0)
+                                    .utc()
+                                    .toISOString()
+                                : "";
+                            const endTimeISO =
+                              date && endTime
+                                ? dayjs(date)
+                                    .hour(Number(endTime.split(":")[0]))
+                                    .minute(Number(endTime.split(":")[1]))
+                                    .second(0)
+                                    .millisecond(0)
+                                    .utc()
+                                    .toISOString()
+                                : "";
                             updateWorkLog.mutate({
                               id: editLog.id,
                               date: dateISO,

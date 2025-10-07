@@ -1,11 +1,15 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 const taskInput = z.object({
   title: z.string(),
-  date: z.coerce.date(),
-  startTime: z.coerce.date(),
-  endTime: z.coerce.date(),
+  date: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
   description: z.string(),
   assignedToId: z.string(),
 });
@@ -22,8 +26,10 @@ export const adminTaskRouter = createTRPCRouter({
       if (user?.role !== "ADMIN") {
         throw new Error("Not authorized");
       }
+      // Normalize date to UTC midnight using dayjs
+      const utcMidnight = dayjs(input.date).utc().startOf("day").toDate();
       return await ctx.db.task.create({
-        data: { ...input, createdById: user.id },
+        data: { ...input, date: utcMidnight, createdById: user.id },
       });
     }),
 
@@ -52,10 +58,17 @@ export const adminTaskRouter = createTRPCRouter({
       if (user?.role !== "ADMIN") {
         throw new Error("Not authorized");
       }
-      // Find all tasks for the specific day
+      console.log("input.date", input.date);
+      const startOfDay = dayjs(input.date).utc().startOf("day").toDate();
+      const endOfDay = dayjs(input.date).utc().endOf("day").toDate();
+      console.log("startOfDay", startOfDay);
+      console.log("endOfDay", endOfDay);
       const tasks = await ctx.db.task.findMany({
         where: {
-          date: input.date,
+          date: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
         },
         include: { createdBy: true, assignedTo: true },
       });

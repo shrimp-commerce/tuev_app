@@ -1,5 +1,7 @@
 "use client";
 
+import dayjs from "dayjs";
+import "dayjs/locale/de";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -12,34 +14,24 @@ import { AdminWorkLogsAccordion } from "./AdminWorkLogsAccordion";
 
 export default function AdminPanel() {
   const t = useTranslations("AdminPanel");
-  const now = new Date();
-  const [displayYear, setDisplayYear] = useState(now.getFullYear());
-  const [displayMonth, setDisplayMonth] = useState(now.getMonth() + 1);
+  const now = dayjs();
+  const [displayYear, setDisplayYear] = useState(now.year());
+  const [displayMonth, setDisplayMonth] = useState(now.month() + 1);
+  const [selectedDate, setSelectedDate] = useState(() => now.startOf("day"));
 
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return today;
-  });
   const handlePrevDay = () => {
-    setSelectedDate((prev) => {
-      const newDate = new Date(prev);
-      newDate.setDate(prev.getDate() - 1);
-      return newDate;
-    });
+    setSelectedDate((prev) => prev.subtract(1, "day"));
   };
   const handleNextDay = () => {
-    setSelectedDate((prev) => {
-      const newDate = new Date(prev);
-      newDate.setDate(prev.getDate() + 1);
-      return newDate;
-    });
+    setSelectedDate((prev) => prev.add(1, "day"));
   };
 
   const getMonthName = (month: number) =>
-    new Date(displayYear, month - 1, 1).toLocaleDateString(undefined, {
-      month: "long",
-    });
+    dayjs()
+      .year(displayYear)
+      .month(month - 1)
+      .locale("de")
+      .format("MMMM");
 
   return (
     <main className="bg-muted/50 min-h-screen w-full px-2 py-8 md:px-8">
@@ -60,12 +52,7 @@ export default function AdminPanel() {
                 <ArrowLeft />
               </Button>
               <span className="text-md font-semibold">
-                {selectedDate.toLocaleDateString("de-DE", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                {selectedDate.locale("de").format("dddd, D. MMMM YYYY")}
               </span>
               <Button variant="outline" onClick={handleNextDay}>
                 <ArrowRight />
@@ -147,12 +134,17 @@ function AddTaskSection() {
     description: string;
     assignedToId: string;
   }) {
-    const utcMidnight = new Date(`${values.date}T00:00:00Z`);
+    // All values are strings, convert to ISO strings for mutation
+    const dateISO = dayjs(`${values.date}T00:00:00Z`).toISOString();
+    const startTimeISO = dayjs(
+      `${values.date}T${values.startTime}`,
+    ).toISOString();
+    const endTimeISO = dayjs(`${values.date}T${values.endTime}`).toISOString();
     createTask.mutate({
       title: values.title,
-      date: utcMidnight,
-      startTime: new Date(`${values.date}T${values.startTime}`),
-      endTime: new Date(`${values.date}T${values.endTime}`),
+      date: dateISO,
+      startTime: startTimeISO,
+      endTime: endTimeISO,
       description: values.description,
       assignedToId: values.assignedToId,
     });

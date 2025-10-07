@@ -13,6 +13,7 @@ import { Alert, AlertTitle } from "../../components/ui/alert";
 import { Card, CardContent } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
 
+import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 
 type WorkLogWithUser = WorkLog & { createdBy: User };
@@ -71,15 +72,11 @@ export function AdminWorkLogsAccordion({
   ): Record<string, WorkLogWithUser[]> {
     return workLogs.reduce(
       (acc, log) => {
-        const dateObj = new Date(log.date);
-        const dayName = dateObj.toLocaleDateString(undefined, {
-          weekday: "long",
-        });
-        const day = dateObj.getDate();
-        const monthName = dateObj.toLocaleDateString(undefined, {
-          month: "long",
-        });
-        const year = dateObj.getFullYear();
+        const dateObj = dayjs(log.date);
+        const dayName = dateObj.locale("de").format("dddd");
+        const day = dateObj.date();
+        const monthName = dateObj.locale("de").format("MMMM");
+        const year = dateObj.year();
         const formattedDate = `${dayName}, ${day}. ${monthName} ${year}`;
         (acc[formattedDate] ??= []).push(log);
         return acc;
@@ -131,15 +128,8 @@ export function AdminWorkLogsAccordion({
                             className="mb-2 flex items-center gap-2 rounded border bg-white px-2 py-1 shadow-sm"
                           >
                             <span className="text-sm whitespace-nowrap text-gray-500">
-                              {new Date(log.startTime).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}{" "}
-                              -{" "}
-                              {new Date(log.endTime).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
+                              {dayjs(log.startTime).format("HH:mm")} -{" "}
+                              {dayjs(log.endTime).format("HH:mm")}
                             </span>
                             <span className="truncate text-gray-800">
                               {log.description}
