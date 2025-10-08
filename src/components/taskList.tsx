@@ -7,6 +7,8 @@ import { Alert, AlertTitle } from "./ui/alert";
 import { Card, CardContent } from "./ui/card";
 dayjs.extend(utc);
 
+import { useEffect } from "react";
+
 interface TaskListProps {
   selectedDate: dayjs.Dayjs;
 }
@@ -20,6 +22,19 @@ const TaskList: React.FC<TaskListProps> = ({ selectedDate }) => {
   const { data, isLoading, error } = api.adminTask.getAllForDay.useQuery({
     date: selectedDateUTC,
   });
+
+  // Prefetch previous and next day for faster navigation
+  const utils = api.useUtils();
+  useEffect(() => {
+    const prevDay = dayjs(selectedDate).subtract(1, "day");
+    const nextDay = dayjs(selectedDate).add(1, "day");
+    void utils.adminTask.getAllForDay.prefetch({
+      date: dayjs.utc(prevDay.format("YYYY-MM-DD")).startOf("day").toDate(),
+    });
+    void utils.adminTask.getAllForDay.prefetch({
+      date: dayjs.utc(nextDay.format("YYYY-MM-DD")).startOf("day").toDate(),
+    });
+  }, [selectedDate, utils]);
 
   return (
     <ul className="flex flex-col gap-4">
