@@ -58,11 +58,8 @@ export const adminTaskRouter = createTRPCRouter({
       if (user?.role !== "ADMIN") {
         throw new Error("Not authorized");
       }
-      console.log("input.date", input.date);
       const startOfDay = dayjs(input.date).utc().startOf("day").toDate();
       const endOfDay = dayjs(input.date).utc().endOf("day").toDate();
-      console.log("startOfDay", startOfDay);
-      console.log("endOfDay", endOfDay);
       const tasks = await ctx.db.task.findMany({
         where: {
           date: {
