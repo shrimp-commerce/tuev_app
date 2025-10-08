@@ -10,23 +10,16 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 import updateLocale from "dayjs/plugin/updateLocale";
 import utc from "dayjs/plugin/utc";
 import weekday from "dayjs/plugin/weekday";
-import { AlertCircleIcon, CalendarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { api } from "~/trpc/react";
 import { ConfirmButton } from "../../components/confirmButton";
 import { EditWorkLogDialog } from "../../components/editWorkLogDialog";
 import { Alert, AlertTitle } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
-import { Calendar } from "../../components/ui/calendar";
 import { Card, CardContent } from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../components/ui/popover";
 import { Separator } from "../../components/ui/separator";
+import type { WorkLogFormValues } from "../../components/WorkLogForm";
+import { WorkLogForm } from "../../components/WorkLogForm";
 dayjs.extend(localizedFormat);
 dayjs.extend(weekday);
 dayjs.extend(updateLocale);
@@ -36,7 +29,7 @@ export function WorkLogs() {
   const t = useTranslations("HomePage");
   // State for edit dialog
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
+  // Remove datePopoverOpen, now handled in WorkLogForm
   const [editLog, setEditLog] = useState<WorkLogWithFormatted | null>(null);
   const updateWorkLog = api.workLog.update.useMutation({
     onSuccess: async () => {
@@ -140,15 +133,20 @@ export function WorkLogs() {
       .locale("de")
       .format("MMMM");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleFormChange(values: WorkLogFormValues) {
+    setDate(values.date);
+    setStartTime(values.startTime);
+    setEndTime(values.endTime);
+    setDescription(values.description);
+  }
+
+  function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!description || !date || !startTime || !endTime) {
       setError("Please fill in all fields.");
       return;
     }
     setError("");
-    // Compose UTC ISO strings using dayjs
-    // Combine date and time as local, then convert to UTC ISO
     const dateISO = date ? date.toISOString() : "";
     const startTimeISO =
       date && startTime
@@ -181,66 +179,14 @@ export function WorkLogs() {
   return (
     <div className="w-full">
       <span className="text-md block pb-4">{t("quickTimeTracking")}</span>
-      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-2">
-        <div className="flex w-full flex-col gap-3">
-          <Label htmlFor="date" className="px-1">
-            <CalendarIcon size={16} /> {t("dateLabel")}
-          </Label>
-          <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                id="date"
-                className="w-full justify-between font-normal"
-              >
-                {date ? dayjs(date).format("D.M.YYYY") : "Select date"}
-                <CalendarIcon size={16} />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto overflow-hidden p-0"
-              align="start"
-            >
-              <Calendar
-                mode="single"
-                selected={date ? date.toDate() : undefined}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  setDate(date ? dayjs(date) : undefined);
-                  setDatePopoverOpen(false);
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="flex flex-row gap-2">
-          <Input
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-          />
-          <Input
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-          />
-        </div>
-        <Input
-          type="text"
-          placeholder={t("description")}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircleIcon />
-            <AlertTitle>{error}</AlertTitle>
-          </Alert>
-        )}
-        <Button type="submit" disabled={createWorkLog.isPending}>
-          {createWorkLog.isPending ? t("submitting") : t("submit")}
-        </Button>
-      </form>
+      <WorkLogForm
+        values={{ date, startTime, endTime, description }}
+        onChange={handleFormChange}
+        onSubmit={handleFormSubmit}
+        error={error}
+        isPending={createWorkLog.isPending}
+        t={t}
+      />
       <Separator className="my-4" />
       <div className="mb-2 flex items-center justify-center gap-2">
         <Button
