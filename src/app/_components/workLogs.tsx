@@ -278,23 +278,7 @@ export function WorkLogs() {
                             if (!open) setEditLog(null);
                           }}
                           initialValues={{
-                            date:
-                              (() => {
-                                if (typeof editLog.date === "string") {
-                                  // If ISO string, extract date part
-                                  const dateStr: string = editLog.date ?? "";
-                                  const isoMatch = /^\d{4}-\d{2}-\d{2}/.exec(
-                                    dateStr,
-                                  );
-                                  return isoMatch ? isoMatch[0] : "";
-                                }
-                                if (editLog.date instanceof Date) {
-                                  return dayjs(editLog.date).format(
-                                    "YYYY-MM-DD",
-                                  );
-                                }
-                                return "";
-                              })() ?? "",
+                            date: dayjs(editLog.date).format("YYYY-MM-DD"),
                             startTime: dayjs
                               .utc(editLog.startTime)
                               .local()
