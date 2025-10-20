@@ -43,6 +43,7 @@ export const adminRouter = createTRPCRouter({
         include: {
           createdBy: true,
         },
+        orderBy: { date: "desc" },
       });
     }),
 
