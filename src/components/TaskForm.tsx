@@ -85,9 +85,7 @@ export function TaskForm({
         </SelectTrigger>
         <SelectContent>
           {loadingUsers ? (
-            <SelectItem value="" disabled>
-              {t("loading")}
-            </SelectItem>
+            <div>{t("loading")}</div>
           ) : (
             users?.map((user) => (
               <SelectItem key={user.id} value={user.id}>

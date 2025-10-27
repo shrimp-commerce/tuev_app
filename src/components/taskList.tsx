@@ -2,54 +2,52 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useTranslations } from "next-intl";
 import React, { useState } from "react";
-import { api } from "../trpc/react";
 import { Alert, AlertTitle } from "./ui/alert";
 import { Card, CardContent } from "./ui/card";
 dayjs.extend(utc);
 
+import type { Task } from "@prisma/client";
 import { Pen } from "lucide-react";
-import { useEffect } from "react";
+import type { User } from "../lib/types";
 import { EditTaskDialog } from "./editTaskDialog";
 
 interface TaskListProps {
-  selectedDate: dayjs.Dayjs;
+  tasks?: (Task & { assignedTo?: User | null })[];
+  users?: User[];
+  loading?: boolean;
+  error?: Error | null;
+  onEditTask?: (
+    taskId: string,
+    data: {
+      title: string;
+      date: string;
+      startTime: string;
+      endTime: string;
+      description?: string;
+      assignedToId?: string;
+    },
+  ) => void;
+  isPending?: boolean;
+  loadingUsers?: boolean;
+  admin?: boolean;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ selectedDate }) => {
+const TaskList: React.FC<TaskListProps> = ({
+  tasks,
+  users,
+  loading = false,
+  error = null,
+  onEditTask,
+  isPending = false,
+  loadingUsers = false,
+  admin = false,
+}) => {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const t = useTranslations("TaskList");
-  const selectedDateUTC = dayjs
-    .utc(selectedDate.format("YYYY-MM-DD"))
-    .startOf("day")
-    .toDate();
-  const { data, isLoading, error } = api.adminTask.getAllForDay.useQuery({
-    date: selectedDateUTC,
-  });
-  const updateTask = api.adminTask.update.useMutation({
-    onSuccess: async () => {
-      await utils.adminTask.invalidate();
-      setEditingTaskId(null);
-    },
-  });
-  const { data: users, isLoading: loadingUsers } =
-    api.admin.getAllUsers.useQuery();
-
-  // Prefetch previous and next day for faster navigation
-  const utils = api.useUtils();
-  useEffect(() => {
-    const prevDay = dayjs(selectedDate).subtract(1, "day");
-    const nextDay = dayjs(selectedDate).add(1, "day");
-    void utils.adminTask.getAllForDay.prefetch({
-      date: dayjs.utc(prevDay.format("YYYY-MM-DD")).startOf("day").toDate(),
-    });
-    void utils.adminTask.getAllForDay.prefetch({
-      date: dayjs.utc(nextDay.format("YYYY-MM-DD")).startOf("day").toDate(),
-    });
-  }, [selectedDate, utils]);
 
   return (
     <ul className="flex flex-col gap-4">
-      {isLoading ? (
+      {loading ? (
         <Alert>
           <AlertTitle>{t("loading")}</AlertTitle>
         </Alert>
@@ -60,8 +58,8 @@ const TaskList: React.FC<TaskListProps> = ({ selectedDate }) => {
             {error instanceof Error ? error.message : t("unknownError")}
           </AlertTitle>
         </Alert>
-      ) : Array.isArray(data) && data.length > 0 ? (
-        data.map((task) => (
+      ) : Array.isArray(tasks) && tasks.length > 0 ? (
+        tasks.map((task) => (
           <Card key={task.id} className="w-full">
             <CardContent>
               <div className="mb-1 flex items-center justify-between gap-2">
@@ -77,88 +75,96 @@ const TaskList: React.FC<TaskListProps> = ({ selectedDate }) => {
                     {task.endTime ? dayjs(task.endTime).format("HH:mm") : "--"}
                   </span>
                 </div>
-                <div
-                  onClick={() => setEditingTaskId(String(task.id))}
-                  className="cursor-pointer"
-                >
-                  <Pen size={16} />
-                </div>
-                {editingTaskId === String(task.id) && (
-                  <EditTaskDialog
-                    open={true}
-                    onOpenChange={(open) => {
-                      if (!open) setEditingTaskId(null);
-                    }}
-                    initialValues={{
-                      assignedToId: task.assignedTo?.id,
-                      date: dayjs(task.date).format("YYYY-MM-DD"),
-                      description: task.description,
-                      startTime: dayjs
-                        .utc(task.startTime)
-                        .local()
-                        .format("HH:mm"),
-                      endTime: dayjs.utc(task.endTime).local().format("HH:mm"),
-                      title: task.title,
-                    }}
-                    users={users?.map(({ id, name, email }) => ({
-                      id,
-                      name: name ?? undefined,
-                      email: email ?? undefined,
-                    }))}
-                    onSubmit={({
-                      date,
-                      startTime,
-                      endTime,
-                      description,
-                      title,
-                      assignedToId,
-                    }) => {
-                      // Compose UTC ISO strings using dayjs
-                      const dateISO = date
-                        ? dayjs.utc(date, "YYYY-MM-DD").toISOString()
-                        : "";
-                      console.log("date", date);
-                      console.log("dateISO", dateISO);
-                      const startTimeISO =
-                        date && startTime
-                          ? dayjs(date)
-                              .hour(Number(startTime.split(":")[0]))
-                              .minute(Number(startTime.split(":")[1]))
-                              .second(0)
-                              .millisecond(0)
-                              .utc()
-                              .toISOString()
-                          : "";
-                      const endTimeISO =
-                        date && endTime
-                          ? dayjs(date)
-                              .hour(Number(endTime.split(":")[0]))
-                              .minute(Number(endTime.split(":")[1]))
-                              .second(0)
-                              .millisecond(0)
-                              .utc()
-                              .toISOString()
-                          : "";
-                      updateTask.mutate({
-                        id: task.id,
-                        data: {
-                          title,
-                          date: dateISO,
-                          startTime: startTimeISO,
-                          endTime: endTimeISO,
+                {admin && (
+                  <>
+                    <div
+                      onClick={() => setEditingTaskId(String(task.id))}
+                      className="cursor-pointer"
+                    >
+                      <Pen size={16} />
+                    </div>
+                    {editingTaskId === String(task.id) && (
+                      <EditTaskDialog
+                        open={true}
+                        onOpenChange={(open) => {
+                          if (!open) setEditingTaskId(null);
+                        }}
+                        initialValues={{
+                          assignedToId: task.assignedTo?.id ?? "",
+                          date: dayjs(task.date).format("YYYY-MM-DD"),
+                          description: task.description ?? "",
+                          startTime: task.startTime
+                            ? dayjs.utc(task.startTime).local().format("HH:mm")
+                            : "",
+                          endTime: task.endTime
+                            ? dayjs.utc(task.endTime).local().format("HH:mm")
+                            : "",
+                          title: task.title,
+                        }}
+                        users={users?.map(({ id, name, email }) => ({
+                          id: String(id),
+                          name: name ?? undefined,
+                          email: email ?? undefined,
+                        }))}
+                        onSubmit={({
+                          date,
+                          startTime,
+                          endTime,
                           description,
+                          title,
                           assignedToId,
-                        },
-                      });
-                    }}
-                    isPending={updateTask.isPending}
-                    loadingUsers={loadingUsers}
-                  />
+                        }) => {
+                          if (onEditTask) {
+                            // Compose UTC ISO strings using dayjs
+                            const dateISO = date
+                              ? dayjs.utc(date, "YYYY-MM-DD").toISOString()
+                              : "";
+                            const startParts = startTime
+                              ? startTime.split(":")
+                              : [];
+                            const endParts = endTime ? endTime.split(":") : [];
+                            const startTimeISO =
+                              date && startParts.length === 2
+                                ? dayjs(date)
+                                    .hour(Number(startParts[0]))
+                                    .minute(Number(startParts[1]))
+                                    .second(0)
+                                    .millisecond(0)
+                                    .utc()
+                                    .toISOString()
+                                : "";
+                            const endTimeISO =
+                              date && endParts.length === 2
+                                ? dayjs(date)
+                                    .hour(Number(endParts[0]))
+                                    .minute(Number(endParts[1]))
+                                    .second(0)
+                                    .millisecond(0)
+                                    .utc()
+                                    .toISOString()
+                                : "";
+                            onEditTask(String(task.id), {
+                              title,
+                              date: dateISO,
+                              startTime: startTimeISO,
+                              endTime: endTimeISO,
+                              description,
+                              assignedToId,
+                            });
+                          }
+                        }}
+                        isPending={isPending}
+                        loadingUsers={loadingUsers}
+                      />
+                    )}
+                  </>
                 )}
               </div>
-              <div className="mb-1 text-sm text-gray-700 dark:text-gray-300">
-                {task.assignedTo?.name ?? task.assignedTo?.id ?? t("unknown")}
-              </div>
+              {admin && (
+                <div className="mb-1 text-sm text-gray-700 dark:text-gray-300">
+                  {task.assignedTo?.name ?? task.assignedTo?.id ?? t("unknown")}
+                </div>
+              )}
               <div className="text-gray-800 dark:text-gray-200">
                 {task.description}
               </div>

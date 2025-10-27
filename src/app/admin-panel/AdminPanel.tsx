@@ -19,6 +19,49 @@ export default function AdminPanel() {
   const [displayMonth, setDisplayMonth] = useState(now.month() + 1);
   const [selectedDate, setSelectedDate] = useState(() => now.startOf("day"));
 
+  // Fetch tasks and users for selected day
+  const selectedDateUTC = dayjs
+    .utc(selectedDate.format("YYYY-MM-DD"))
+    .startOf("day")
+    .toDate();
+  const {
+    data: tasks,
+    isLoading,
+    error: error,
+  } = api.adminTask.getAllForDay.useQuery({
+    date: selectedDateUTC,
+  });
+  const { data: users, isLoading: loadingUsers } =
+    api.admin.getAllUsers.useQuery();
+
+  const utils = api.useUtils();
+  const updateTask = api.adminTask.update.useMutation({
+    onSuccess: async () => {
+      await utils.adminTask.invalidate();
+    },
+  });
+
+  const handleEditTask = (
+    taskId: string,
+    data: {
+      title: string;
+      date: string;
+      startTime: string;
+      endTime: string;
+      description?: string;
+      assignedToId?: string;
+    },
+  ) => {
+    updateTask.mutate({
+      id: Number(taskId),
+      data: {
+        ...data,
+        description: data.description ?? "",
+        assignedToId: data.assignedToId ?? "",
+      },
+    });
+  };
+
   const handlePrevDay = () => {
     setSelectedDate((prev) => prev.subtract(1, "day"));
   };
@@ -59,7 +102,16 @@ export default function AdminPanel() {
               </Button>
             </div>
             <AddTaskSection />
-            <TaskList selectedDate={selectedDate} />
+            <TaskList
+              tasks={tasks}
+              users={users}
+              loading={isLoading}
+              error={error?.message ? new Error(error.message) : null}
+              onEditTask={handleEditTask}
+              isPending={updateTask.isPending}
+              loadingUsers={loadingUsers}
+              admin={true}
+            />
           </CardContent>
         </Card>
 

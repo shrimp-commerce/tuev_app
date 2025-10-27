@@ -177,18 +177,22 @@ export function WorkLogs() {
   }
 
   return (
-    <div className="w-full">
-      <span className="text-md block pb-4">{t("quickTimeTracking")}</span>
-      <WorkLogForm
-        values={{ date, startTime, endTime, description }}
-        onChange={handleFormChange}
-        onSubmit={handleFormSubmit}
-        error={error}
-        isPending={createWorkLog.isPending}
-        t={t}
-      />
-      <Separator className="my-4" />
-      <div className="mb-2 flex items-center justify-center gap-2">
+    <div className="flex w-full flex-col gap-4">
+      <Card>
+        <CardContent>
+          <span className="text-md block pb-4">{t("quickTimeTracking")}</span>
+          <WorkLogForm
+            values={{ date, startTime, endTime, description }}
+            onChange={handleFormChange}
+            onSubmit={handleFormSubmit}
+            error={error}
+            isPending={createWorkLog.isPending}
+            t={t}
+          />
+        </CardContent>
+      </Card>
+
+      <div className="flex items-center justify-center gap-2">
         <Button
           type="button"
           variant="outline"
@@ -225,22 +229,23 @@ export function WorkLogs() {
           &#8594;
         </Button>
       </div>
-      <div className="mb-6 flex flex-col gap-4">
-        {workLogs.isLoading ? (
-          <Alert>
-            <AlertTitle>{t("loading")}</AlertTitle>
-          </Alert>
-        ) : workLogs.data && workLogs.data.length > 0 ? (
-          Object.entries(groupWorkLogsByDate(workLogs.data)).map(
-            ([date, logs]) => (
-              <Card key={date} className="mb-4">
-                <CardContent className="py-4">
+
+      <Card>
+        <CardContent className="mb-6 flex flex-col gap-4">
+          {workLogs.isLoading ? (
+            <Alert>
+              <AlertTitle>{t("loading")}</AlertTitle>
+            </Alert>
+          ) : workLogs.data && workLogs.data.length > 0 ? (
+            Object.entries(groupWorkLogsByDate(workLogs.data)).map(
+              ([date, logs]) => (
+                <div key={date} className="mb-4">
                   <h3 className="text-sm font-bold">{date}</h3>
                   <Separator className="mb-2" />
                   {logs.map((log) => (
                     <div
                       key={log.id}
-                      className="mb-2 flex items-center justify-between gap-2 rounded border bg-white px-2 py-1 shadow-sm"
+                      className="mb-2 flex items-center justify-between gap-2 px-2 py-1"
                     >
                       <div className="flex min-w-0 items-center gap-2">
                         <span className="text-sm whitespace-nowrap text-gray-500">
@@ -269,7 +274,6 @@ export function WorkLogs() {
                           disabled={deleteWorkLog.isPending}
                         />
                       </div>
-                      {/* Edit WorkLog Dialog */}
                       {editLog && (
                         <EditWorkLogDialog
                           open={editDialogOpen}
@@ -300,7 +304,6 @@ export function WorkLogs() {
                             endTime: string;
                             description: string;
                           }) => {
-                            // Compose UTC ISO strings using dayjs
                             const dateISO = date
                               ? dayjs(date).toISOString()
                               : "";
@@ -337,16 +340,16 @@ export function WorkLogs() {
                       )}
                     </div>
                   ))}
-                </CardContent>
-              </Card>
-            ),
-          )
-        ) : (
-          <Alert>
-            <AlertTitle>{t("noWorkLogs")}</AlertTitle>
-          </Alert>
-        )}
-      </div>
+                </div>
+              ),
+            )
+          ) : (
+            <Alert>
+              <AlertTitle>{t("noWorkLogs")}</AlertTitle>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

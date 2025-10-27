@@ -85,5 +85,9 @@
     "taskCreatedBy": "Created By",
     "unknown": "Unknown",
     "noTasksFound": "No tasks found."
+  },
+  "TodaysTasks": {
+    "title": "Today's Tasks",
+    "noTasks": "No tasks for today."
   }
 }
