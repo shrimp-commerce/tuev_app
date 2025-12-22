@@ -74,7 +74,11 @@
     "nextMonth": "Next month",
     "noWorkLogsForMonth": "No work logs for this month.",
     "loading": "Loading...",
-    "errorLoadingWorklogs": "Error loading work logs."
+    "errorLoadingWorklogs": "Error loading work logs.",
+    "tasksForSelectedWeek": "Tasks for selected week",
+    "previousWeek": "Previous week",
+    "currentWeek": "Current week",
+    "nextWeek": "Next week"
   },
   "TaskList": {
     "loading": "Loading tasks...",
@@ -84,10 +88,26 @@
     "taskDescription": "Description",
     "taskCreatedBy": "Created By",
     "unknown": "Unknown",
-    "noTasksFound": "No tasks found."
+    "noTasksFound": "No tasks found.",
+    "previousWeek": "Previous week",
+    "currentWeek": "Current week",
+    "nextWeek": "Next week"
   },
   "TodaysTasks": {
     "title": "Today's Tasks",
     "noTasks": "No tasks for today."
+  },
+  "WeeksTasks": {
+    "title": "This Week's Tasks",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "loading": "Loading tasks...",
+    "errorLoadingTasks": "Error loading tasks",
+    "noTasksFound": "No tasks found."
   }
 }

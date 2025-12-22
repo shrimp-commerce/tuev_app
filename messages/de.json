@@ -74,7 +74,11 @@
     "nextMonth": "Nächster Monat",
     "noWorkLogsForMonth": "Keine Arbeitszeiteinträge für diesen Monat.",
     "loading": "Lädt...",
-    "errorLoadingWorklogs": "Fehler beim Laden der Arbeitszeiteinträge."
+    "errorLoadingWorklogs": "Fehler beim Laden der Arbeitszeiteinträge.",
+    "tasksForSelectedWeek": "Aufgaben für die ausgewählte Woche",
+    "previousWeek": "Vorherige Woche",
+    "currentWeek": "Aktuelle Woche",
+    "nextWeek": "Nächste Woche"
   },
   "TaskList": {
     "loading": "Aufgaben werden geladen...",
@@ -84,10 +88,29 @@
     "taskDescription": "Beschreibung",
     "taskCreatedBy": "Erstellt von",
     "unknown": "Unbekannt",
-    "noTasksFound": "Keine Aufgaben gefunden."
+    "noTasksFound": "Keine Aufgaben gefunden.",
+    "previousWeek": "Vorherige Woche",
+    "currentWeek": "Aktuelle Woche",
+    "nextWeek": "Nächste Woche"
   },
   "TodaysTasks": {
     "title": "Heutige Aufgaben",
     "noTasks": "Keine Aufgaben für heute."
+  },
+  "WeeksTasks": {
+    "title": "Aufgaben dieser Woche",
+    "monday": "Montag",
+    "tuesday": "Dienstag",
+    "wednesday": "Mittwoch",
+    "thursday": "Donnerstag",
+    "friday": "Freitag",
+    "saturday": "Samstag",
+    "sunday": "Sonntag",
+    "loading": "Aufgaben werden geladen...",
+    "errorLoadingTasks": "Fehler beim Laden der Aufgaben",
+    "noTasksFound": "Keine Aufgaben gefunden.",
+    "previousWeek": "Vorherige Woche",
+    "currentWeek": "Aktuelle Woche",
+    "nextWeek": "Nächste Woche"
   }
 }

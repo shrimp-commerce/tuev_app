@@ -2,6 +2,7 @@ import { auth } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
 import TodaysTasks from "../components/todaysTasks";
 import { Card, CardContent } from "../components/ui/card";
+import WeeksTasks from "../components/weeksTasks";
 import { WorkLogs } from "./_components/workLogs";
 
 export default async function Home() {
@@ -15,6 +16,7 @@ export default async function Home() {
             <Card>
               <CardContent className="flex flex-col gap-8">
                 <TodaysTasks />
+                <WeeksTasks />
               </CardContent>
             </Card>
           )}

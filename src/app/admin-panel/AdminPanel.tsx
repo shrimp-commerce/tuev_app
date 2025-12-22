@@ -8,6 +8,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 import { AddTaskDialog } from "../../components/addTaskDialog";
 import TaskList from "../../components/taskList";
+import TaskWeekList from "../../components/taskWeekList";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { AdminWorkLogsAccordion } from "./AdminWorkLogsAccordion";
@@ -18,8 +19,28 @@ export default function AdminPanel() {
   const [displayYear, setDisplayYear] = useState(now.year());
   const [displayMonth, setDisplayMonth] = useState(now.month() + 1);
   const [selectedDate, setSelectedDate] = useState(() => now.startOf("day"));
+  const [weekOffset, setWeekOffset] = useState(0);
 
-  // Fetch tasks and users for selected day
+  const selectedWeekDateUTC = dayjs
+    .utc(selectedDate.format("YYYY-MM-DD"))
+    .startOf("day")
+    .toDate();
+  const {
+    data: weekTasks,
+    isLoading: isLoadingWeek,
+    error: errorWeek,
+  } = api.adminTask.getAllForWeek.useQuery({
+    date: selectedWeekDateUTC,
+    offset: weekOffset,
+  });
+
+  let weekStart = dayjs(selectedWeekDateUTC)
+    .add(weekOffset, "week")
+    .startOf("week");
+  if (weekStart.day() !== 1) {
+    weekStart = weekStart.day(1);
+  }
+  const weekEnd = weekStart.add(6, "day");
   const selectedDateUTC = dayjs
     .utc(selectedDate.format("YYYY-MM-DD"))
     .startOf("day")
@@ -111,6 +132,38 @@ export default function AdminPanel() {
               isPending={updateTask.isPending}
               loadingUsers={loadingUsers}
               admin={true}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="flex flex-col gap-4">
+            <h2 className="mb-2 text-xl font-semibold">
+              {t("tasksForSelectedWeek", {
+                default: "Tasks for selected week",
+              })}
+            </h2>
+            <div className="mb-4 flex gap-2">
+              <Button onClick={() => setWeekOffset((o) => o - 1)}>
+                {t("previousWeek", { default: "Previous week" })}
+              </Button>
+              <Button
+                onClick={() => setWeekOffset(0)}
+                disabled={weekOffset === 0}
+              >
+                {t("currentWeek", { default: "Current week" })}
+              </Button>
+              <Button onClick={() => setWeekOffset((o) => o + 1)}>
+                {t("nextWeek", { default: "Next week" })}
+              </Button>
+            </div>
+            <div className="mb-4 text-center text-sm text-gray-600 dark:text-gray-300">
+              {weekStart.format("DD.MM.YYYY")} - {weekEnd.format("DD.MM.YYYY")}
+            </div>
+            <TaskWeekList
+              data={weekTasks}
+              loading={isLoadingWeek}
+              error={errorWeek}
             />
           </CardContent>
         </Card>
