@@ -100,12 +100,6 @@ export default function AdminPanel() {
   return (
     <main className="bg-muted/50 min-h-screen w-full px-2 py-8 md:px-8">
       <div className="mx-auto max-w-5xl space-y-8">
-        <header className="flex flex-col gap-4 border-b pb-4 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {t("title", { default: "Admin Panel" })}
-          </h1>
-        </header>
-
         <Card>
           <CardContent className="flex flex-col gap-4">
             <h2 className="mb-2 text-xl font-semibold">
