@@ -132,32 +132,16 @@ export default function AdminPanel() {
 
         <Card>
           <CardContent className="flex flex-col gap-4">
-            <h2 className="mb-2 text-xl font-semibold">
-              {t("tasksForSelectedWeek", {
-                default: "Tasks for selected week",
-              })}
-            </h2>
-            <div className="mb-4 flex gap-2">
-              <Button onClick={() => setWeekOffset((o) => o - 1)}>
-                {t("previousWeek", { default: "Previous week" })}
-              </Button>
-              <Button
-                onClick={() => setWeekOffset(0)}
-                disabled={weekOffset === 0}
-              >
-                {t("currentWeek", { default: "Current week" })}
-              </Button>
-              <Button onClick={() => setWeekOffset((o) => o + 1)}>
-                {t("nextWeek", { default: "Next week" })}
-              </Button>
-            </div>
-            <div className="mb-4 text-center text-sm text-gray-600 dark:text-gray-300">
-              {weekStart.format("DD.MM.YYYY")} - {weekEnd.format("DD.MM.YYYY")}
-            </div>
             <TaskWeekList
               data={weekTasks}
               loading={isLoadingWeek}
               error={errorWeek}
+              weekStart={weekStart.format("DD.MM.YYYY")}
+              weekEnd={weekEnd.format("DD.MM.YYYY")}
+              onPrevWeek={() => setWeekOffset((o) => o - 1)}
+              onNextWeek={() => setWeekOffset((o) => o + 1)}
+              onCurrentWeek={() => setWeekOffset(0)}
+              disableCurrentWeek={weekOffset === 0}
             />
           </CardContent>
         </Card>
@@ -165,6 +149,7 @@ export default function AdminPanel() {
         <Card>
           <CardContent>
             <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="text-xl font-semibold">{t("employeeOverview")}</h2>
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
@@ -202,9 +187,6 @@ export default function AdminPanel() {
                   &#8594;
                 </Button>
               </div>
-              <h2 className="text-xl font-semibold">
-                {t("workLogs", { default: "Work Logs" })}
-              </h2>
             </div>
             <AdminWorkLogsAccordion year={displayYear} month={displayMonth} />
           </CardContent>
